@@ -84,6 +84,26 @@ body{
   }
 </style>
 
+
+<style id="chaseParentCursorOwnership">
+  body.chase-open,
+  body.chase-open * {
+    cursor:none !important;
+  }
+
+  body.chase-open #wp-custom-cursor,
+  body.chase-open #customCursor,
+  body.chase-open #cursor,
+  body.chase-open .custom-cursor,
+  body.chase-open .site-cursor,
+  body.chase-open .cursor {
+    display:none !important;
+    opacity:0 !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+</style>
+
 </head>
 <body>
   <main class="stage">
@@ -268,6 +288,7 @@ body{
   function closeChase(){
     stopTitleAudio();
     frame.src = 'about:blank';
+    document.body.classList.remove('chase-open');
     overlay.classList.remove('open');
     overlay.setAttribute('aria-hidden', 'true');
   }
@@ -282,6 +303,7 @@ body{
       audio.volume = 0.85;
       audio.play().catch(() => {});
 
+      document.body.classList.add('chase-open');
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden', 'false');
       frame.src = 'nathaniel-chase.html?embedded=1';
@@ -300,6 +322,70 @@ body{
     }
   });
 })();
+</script>
+
+
+<audio id="phoneUnlockClick" preload="auto">
+  <source src="assets/audio/unlockphone.mp3">
+</audio>
+
+
+<script id="unlockClickReliabilityFix">
+(() => {
+  const unlockAudio = document.getElementById("phoneUnlockClick");
+  if (!unlockAudio) return;
+
+  unlockAudio.preload = "auto";
+
+  window.playPhoneUnlockClick = function() {
+    try {
+      unlockAudio.pause();
+      unlockAudio.currentTime = 0;
+      const p = unlockAudio.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch (_) {}
+  };
+
+  // Re-arm audio after returning to the phone home screen.
+  window.addEventListener("pageshow", () => {
+    try {
+      unlockAudio.pause();
+      unlockAudio.currentTime = 0;
+      unlockAudio.load();
+    } catch (_) {}
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      try {
+        unlockAudio.pause();
+        unlockAudio.currentTime = 0;
+      } catch (_) {}
+    }
+  });
+})();
+</script>
+
+
+<script id="unlockClickDelegatedFallback">
+document.addEventListener("pointerup", (event) => {
+  const target = event.target.closest(
+    '#unlockSlider, #slider, #slideHandle, .unlock-slider, .slide-to-unlock, .slider-handle, .unlock-handle'
+  );
+  if (target && window.playPhoneUnlockClick) {
+    window.playPhoneUnlockClick();
+  }
+});
+</script>
+
+
+<script id="chaseCursorRestoreGuard">
+window.addEventListener("pageshow", () => {
+  const overlay = document.getElementById("chaseAppOverlay");
+  if (!overlay || !overlay.classList.contains("open")) {
+    document.body.classList.remove("chase-open");
+  }
+});
 </script>
 
 </body>
