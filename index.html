@@ -65,6 +65,25 @@ body{
     }
   </style>
 
+
+<style id="chaseOverlayStyles">
+  #chaseAppOverlay{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:none;
+    background:#050307;
+  }
+  #chaseAppOverlay.open{display:block}
+  #chaseAppFrame{
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
+    background:#050307;
+  }
+</style>
+
 </head>
 <body>
   <main class="stage">
@@ -161,7 +180,7 @@ body{
               <span class="app-name">WP FLIGHT</span>
             </a>
 
-            <a class="app-link" href="nathaniel-chase.html">
+            <a class="app-link" href="nathaniel-chase.html" data-chase-launcher="true">
               <div class="app-icon image-icon chase-game-icon nathaniel-head-app-icon">
                 <img src="assets/images/nathaniel-chase/nathaniel.png" alt="">
               </div>
@@ -214,5 +233,74 @@ body{
 
   <script src="script.js"></script>
   <script src="cursor.js"></script>
+
+<audio id="chaseLauncherAudio" preload="auto" loop>
+  <source src="assets/audio/iwannashow.mp3" type="audio/mpeg">
+</audio>
+
+
+
+
+
+<div id="chaseAppOverlay" aria-hidden="true">
+  <iframe
+    id="chaseAppFrame"
+    title="Nathaniel Chase"
+    allow="autoplay"
+    src="about:blank"></iframe>
+</div>
+
+
+<script id="chaseLauncherController">
+(() => {
+  const launchers = document.querySelectorAll('[data-chase-launcher="true"]');
+  const audio = document.getElementById('chaseLauncherAudio');
+  const overlay = document.getElementById('chaseAppOverlay');
+  const frame = document.getElementById('chaseAppFrame');
+
+  if (!launchers.length || !audio || !overlay || !frame) return;
+
+  function stopTitleAudio(){
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  function closeChase(){
+    stopTitleAudio();
+    frame.src = 'about:blank';
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+
+  launchers.forEach((launcher) => {
+    launcher.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      // This starts inside the app-icon click, so mobile browsers permit it.
+      audio.currentTime = 0;
+      audio.loop = true;
+      audio.volume = 0.85;
+      audio.play().catch(() => {});
+
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      frame.src = 'nathaniel-chase.html?embedded=1';
+    });
+  });
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== frame.contentWindow) return;
+
+    if (event.data === 'chase-game-started') {
+      stopTitleAudio();
+    }
+
+    if (event.data === 'close-chase-app') {
+      closeChase();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
