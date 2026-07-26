@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Wind Python Flight</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .game-screen {
+      background: linear-gradient(#8fd7ef 0 64%, #f6e8a8 64% 100%);
+    }
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: manipulation;
+      
+    }
+
+    .game-screen,
+    .game-screen * {
+      
+    }
+
+    .game-message,
+    .game-message * {
+      
+    }
+
+    .game-message button,
+    .landscape-back {
+      
+    }
+    .game-ui {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .game-title {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      text-shadow: 0 3px 0 rgba(0,0,0,.22);
+      font-size: clamp(18px, 2.2vw, 34px);
+      font-weight: 900;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+    .score {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      color: #fff;
+      font-weight: 900;
+      font-size: clamp(22px, 3vw, 44px);
+      text-shadow: 0 3px 0 rgba(0,0,0,.25);
+    }
+    .game-message {
+      position: absolute;
+      z-index: 40;
+      left: 50%;
+      top: 54%;
+      transform: translate(-50%,-50%);
+      width: min(460px, 78%);
+      padding: 22px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.88);
+      border: 3px solid rgba(0,0,0,.15);
+      text-align: center;
+      color: #222;
+      pointer-events: auto;
+      box-shadow: 0 12px 26px rgba(0,0,0,.18);
+    }
+    .game-message h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 4vw, 44px);
+    }
+    .game-message p {
+      margin: 5px 0;
+    }
+    .game-message button {
+      margin-top: 14px;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font: inherit;
+      font-weight: 900;
+      background: #ef5f9a;
+      color: #fff;
+      
+    }
+    .hidden { display:none; }
+  </style>
+
+<style id="global-tabletop-continuity">
+html,body{min-height:100%;}
+body{
+
+  background-color:#c89b6e;
+  background-image:
+    radial-gradient(ellipse at 18% 11%, rgba(255,255,255,.16), transparent 26%),
+    radial-gradient(ellipse at 78% 92%, rgba(80,39,17,.10), transparent 31%),
+    repeating-linear-gradient(2deg,
+      rgba(92,47,20,.030) 0px,
+      rgba(92,47,20,.030) 1px,
+      transparent 2px,
+      transparent 13px),
+    repeating-linear-gradient(178deg,
+      transparent 0px,
+      transparent 33px,
+      rgba(255,255,255,.026) 34px,
+      transparent 36px,
+      transparent 77px),
+    linear-gradient(104deg,#d9b184 0%,#cfa375 36%,#d5aa7b 62%,#c39467 100%);
+  background-size:auto,auto,100% 27px,100% 91px,auto;
+  background-position:center;
+  background-repeat:no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-attachment:fixed;
+
+}
+</style>
+
+</head>
+<body class="landscape-page">
+  <div class="landscape-phone">
+    <div class="landscape-screen game-screen">
+      <a class="landscape-back" href="index.html">← BazingaOS</a>
+      <canvas id="gameCanvas" width="1000" height="560" aria-label="Wind Python flying mini game"></canvas>
+      <div class="game-ui">
+        <div class="game-title">WIND PYTHON FLIGHT</div>
+        <div class="score" id="score">0</div>
+        <section class="game-message" id="startPanel">
+          <h1>Ready to fly?</h1>
+          <p>Tap, click, or press the spacebar to rise.</p>
+          <p>Fly through the gaps without crashing.</p>
+          <button id="startButton" type="button">Start flight</button>
+        </section>
+        <section class="game-message hidden" id="gameOverPanel">
+          <h1>Flight over</h1>
+          <p>Score: <strong id="finalScore">0</strong></p>
+          <p>Best: <strong id="bestScore">0</strong></p>
+          <button id="restartButton" type="button">Fly again</button>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div class="rotate-hint">Rotate your device for the best view</div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    const scoreEl = document.getElementById('score');
+    const startPanel = document.getElementById('startPanel');
+    const gameOverPanel = document.getElementById('gameOverPanel');
+    const finalScoreEl = document.getElementById('finalScore');
+    const bestScoreEl = document.getElementById('bestScore');
+    const startButton = document.getElementById('startButton');
+    const restartButton = document.getElementById('restartButton');
+
+    const flyer = new Image();
+    flyer.src = 'assets/images/wind-python-fly-cropped.png';
+
+    const spriteAnim = {
+      frame: 0,
+      elapsed: 0,
+      frameDuration: 1000 / 9,
+      sequence: [
+        { scaleY: 0.98, scaleX: 1.01, offsetY: 1.2, tilt: -0.015 },
+        { scaleY: 1.03, scaleX: 0.99, offsetY: -1.0, tilt: -0.03 },
+        { scaleY: 1.00, scaleX: 1.00, offsetY: -0.3, tilt: -0.01 },
+        { scaleY: 0.97, scaleX: 1.02, offsetY: 1.0, tilt: 0.015 },
+        { scaleY: 1.00, scaleX: 1.00, offsetY: 0.2, tilt: 0.00 }
+      ]
+    };
+
+    let running = false;
+    let gameOver = false;
+    let frame = 0;
+    let score = 0;
+    let best = 0;
+    let pipes = [];
+
+    const player = {
+      x: 175,
+      y: 250,
+      w: 58.67,
+      h: 48.85,
+      vy: 0,
+      gravity: 0.38,
+      flap: -6.8,
+      rotation: 0
+    };
+
+    // Tight collision rectangle covering the central visible body.
+    // The large wings and tip are intentionally forgiving.
+    const collider = {
+      left: 0.18,
+      right: 0.10,
+      top: 0.18,
+      bottom: 0.16
+    };
+
+    function resetGame() {
+      player.y = canvas.height / 2 - 40;
+      player.vy = 0;
+      spriteAnim.frame = 0;
+      spriteAnim.elapsed = 0;
+      pipes = [];
+      score = 0;
+      frame = 0;
+      running = true;
+      gameOver = false;
+      scoreEl.textContent = '0';
+      startPanel.classList.add('hidden');
+      gameOverPanel.classList.add('hidden');
+    }
+
+    function flap() {
+      if (!running) return;
+      player.vy = player.flap;
+    }
+
+    function addPipe() {
+      const gap = 190;
+      const margin = 72;
+      const top = margin + Math.random() * (canvas.height - gap - margin * 2);
+      pipes.push({
+        x: canvas.width + 30,
+        w: 86,
+        top,
+        gap,
+        passed: false
+      });
+    }
+
+    function intersects(px, py, pw, ph, rx, ry, rw, rh) {
+      const left = px + pw * collider.left;
+      const right = px + pw * (1 - collider.right);
+      const top = py + ph * collider.top;
+      const bottom = py + ph * (1 - collider.bottom);
+
+      return left < rx + rw &&
+             right > rx &&
+             top < ry + rh &&
+             bottom > ry;
+    }
+
+    function endGame() {
+      if (gameOver) return;
+      running = false;
+      gameOver = true;
+      best = Math.max(best, score);
+      finalScoreEl.textContent = score;
+      bestScoreEl.textContent = best;
+      gameOverPanel.classList.remove('hidden');
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = '#8fd7ef';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = 'rgba(255,255,255,.75)';
+      for (let i = 0; i < 6; i++) {
+        const x = (i * 210 - (frame * .35) % 1260) + 40;
+        const y = 75 + (i % 3) * 85;
+        ctx.beginPath();
+        ctx.arc(x, y, 24, 0, Math.PI * 2);
+        ctx.arc(x + 28, y - 12, 32, 0, Math.PI * 2);
+        ctx.arc(x + 64, y, 24, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = '#f6e8a8';
+      ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+      ctx.fillStyle = '#d7c77b';
+      ctx.fillRect(0, canvas.height - 70, canvas.width, 8);
+    }
+
+    function drawPipe(pipe) {
+      const grad = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.w, 0);
+      grad.addColorStop(0, '#f7a8cc');
+      grad.addColorStop(.5, '#ef5f9a');
+      grad.addColorStop(1, '#c83d77');
+      ctx.fillStyle = grad;
+
+      ctx.fillRect(pipe.x, 0, pipe.w, pipe.top);
+      ctx.fillRect(pipe.x, pipe.top + pipe.gap, pipe.w, canvas.height - (pipe.top + pipe.gap) - 70);
+
+      ctx.fillStyle = '#fff0a9';
+      ctx.fillRect(pipe.x - 8, pipe.top - 20, pipe.w + 16, 20);
+      ctx.fillRect(pipe.x - 8, pipe.top + pipe.gap, pipe.w + 16, 20);
+    }
+
+    function drawPlayer() {
+      const frame = spriteAnim.sequence[spriteAnim.frame];
+      const velocityTilt = Math.max(-0.14, Math.min(0.14, player.vy * 0.018));
+      const angle = velocityTilt + frame.tilt;
+
+      ctx.save();
+      ctx.translate(
+        player.x + player.w / 2,
+        player.y + player.h / 2 + frame.offsetY
+      );
+      ctx.rotate(angle);
+      ctx.scale(frame.scaleX, frame.scaleY);
+
+      if (flyer.complete && flyer.naturalWidth) {
+        const sourceAspect = flyer.naturalWidth / flyer.naturalHeight;
+        let drawW = player.w;
+        let drawH = drawW / sourceAspect;
+
+        if (drawH > player.h) {
+          drawH = player.h;
+          drawW = drawH * sourceAspect;
+        }
+
+        // Snap to half-pixels to reduce shimmer while moving.
+        const dx = Math.round((-drawW / 2) * 2) / 2;
+        const dy = Math.round((-drawH / 2) * 2) / 2;
+        const dw = Math.round(drawW * 2) / 2;
+        const dh = Math.round(drawH * 2) / 2;
+
+        ctx.drawImage(flyer, dx, dy, dw, dh);
+      } else {
+        ctx.fillStyle = '#ffe46b';
+        ctx.fillRect(-player.w / 2, -player.h / 2, player.w, player.h);
+      }
+
+      ctx.restore();
+    }
+    function update() {
+      if (!running) return;
+
+      frame++;
+      player.vy += player.gravity;
+      player.y += player.vy;
+
+      if (frame % 105 === 0) addPipe();
+
+      for (const pipe of pipes) {
+        pipe.x -= 3.9;
+
+        if (!pipe.passed && pipe.x + pipe.w < player.x) {
+          pipe.passed = true;
+          score++;
+          scoreEl.textContent = score;
+        }
+
+        const hitTop = intersects(player.x, player.y, player.w, player.h, pipe.x, 0, pipe.w, pipe.top);
+        const bottomY = pipe.top + pipe.gap;
+        const hitBottom = intersects(player.x, player.y, player.w, player.h, pipe.x, bottomY, pipe.w, canvas.height - bottomY - 70);
+        if (hitTop || hitBottom) endGame();
+      }
+
+      pipes = pipes.filter(pipe => pipe.x + pipe.w > -20);
+
+      if (player.y < -20 || player.y + player.h > canvas.height - 70) {
+        endGame();
+      }
+    }
+
+    function draw() {
+      drawBackground();
+      pipes.forEach(drawPipe);
+      drawPlayer();
+    }
+
+    let lastAnimationTime = performance.now();
+
+    function loop(now = performance.now()) {
+      const delta = Math.min(50, now - lastAnimationTime);
+      lastAnimationTime = now;
+
+      spriteAnim.elapsed += delta;
+      while (spriteAnim.elapsed >= spriteAnim.frameDuration) {
+        spriteAnim.elapsed -= spriteAnim.frameDuration;
+        spriteAnim.frame =
+          (spriteAnim.frame + 1) % spriteAnim.sequence.length;
+      }
+
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    function action(event) {
+      const target = event.target;
+      if (target.closest && target.closest('a, button')) return;
+      flap();
+    }
+
+    canvas.addEventListener('pointerdown', action);
+    document.addEventListener('keydown', (event) => {
+      if (event.code === 'Space') {
+        event.preventDefault();
+
+        if (!running) {
+          resetGame();
+          flap();
+          return;
+        }
+
+        flap();
+      }
+    });
+    startButton.addEventListener('click', () => {
+      resetGame();
+      flap();
+    });
+
+    restartButton.addEventListener('click', () => {
+      resetGame();
+      flap();
+    });
+
+    draw();
+    loop();
+  </script>
+  <script src="cursor.js"></script>
+</body>
+</html>

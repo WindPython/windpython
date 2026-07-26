@@ -1,0 +1,113 @@
+* { box-sizing: border-box; }
+:root {
+  --pink: #efafc9;
+  --pink-deep: #e66d9f;
+  --baby-blue: #9fd5f1;
+  --yellow: #f4d35e;
+  --ink: #151419;
+}
+html,body { margin:0; min-height:100%; }
+body {
+  font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(145deg,var(--baby-blue),#f4bfd4 60%,var(--yellow));
+}
+.page {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:70px 24px;
+}
+.back {
+  position:fixed;
+  left:20px;
+  top:18px;
+  padding:11px 14px;
+  border:3px solid var(--ink);
+  border-radius:12px;
+  background:#fff;
+  color:var(--ink);
+  font-weight:1000;
+  text-decoration:none;
+  box-shadow:4px 5px 0 var(--ink);
+}
+.panel {
+  width:min(760px,94vw);
+  padding:clamp(38px,7vw,72px);
+  border:5px solid var(--ink);
+  border-radius:32px;
+  background:rgba(255,255,255,.8);
+  text-align:center;
+  box-shadow:12px 14px 0 rgba(21,20,25,.16);
+}
+.icon { font-size:70px; }
+h1 {
+  margin:10px 0 24px;
+  color:var(--pink-deep);
+  font-size:clamp(52px,10vw,104px);
+  line-height:.82;
+  letter-spacing:-4px;
+  -webkit-text-stroke:3px var(--ink);
+  paint-order:stroke fill;
+  text-shadow:5px 6px 0 #fff;
+}
+p { max-width:590px; margin:0 auto; font-size:21px; line-height:1.5; }
+.note { margin-top:24px; font-size:15px; font-weight:1000; }
+
+
+/* BazingaOS animated cursor */
+@media (pointer: fine) {
+  html,
+  body,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  .app-link,
+  .unlock-handle {
+    cursor: none !important;
+  }
+
+  .bazinga-cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 32px;
+    height: 32px;
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(-100px, -100px, 0);
+    transform-origin: 50% 8%;
+    transition:
+      opacity .12s ease,
+      filter .12s ease;
+    will-change: transform;
+  }
+
+  .bazinga-cursor img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: pixelated;
+    transform-origin: 50% 8%;
+    transition:
+      transform .09s cubic-bezier(.2,.8,.2,1),
+      filter .12s ease;
+  }
+
+  .bazinga-cursor.is-visible {
+    opacity: 1;
+  }
+
+  .bazinga-cursor.is-hovering img {
+    transform: scale(1.07) rotate(-2deg);
+    filter: drop-shadow(0 2px 0 rgba(0,0,0,.28));
+  }
+
+  .bazinga-cursor.is-clicking img {
+    transform: translateY(3px) scale(.92, .86) rotate(3deg);
+    filter: drop-shadow(0 1px 0 rgba(0,0,0,.22));
+  }
+}

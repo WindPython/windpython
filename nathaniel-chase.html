@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nathaniel Chase</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0711}
+  body{font-family:Arial,Helvetica,sans-serif}
+  .arcade-shell{position:fixed;inset:0;display:grid;place-items:center;background:
+    radial-gradient(circle at 50% 18%,#3a1645 0,#15091d 45%,#050307 100%)}
+  .phone-game{position:relative;width:min(100vw,540px);height:min(100vh,880px);
+    background:#05030a;overflow:hidden;border:0;box-sizing:border-box}
+  canvas{display:block;width:100%;height:100%;image-rendering:pixelated;background:#05030a}
+  .scanlines{position:absolute;inset:0;pointer-events:none;z-index:8;opacity:.16;
+    background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(0,0,0,.36) 4px)}
+  .topbar{position:absolute;left:0;right:0;top:0;z-index:10;display:flex;justify-content:space-between;
+    align-items:center;padding:10px 12px;color:#fff;font:900 12px "Courier New",monospace;
+    background:linear-gradient(rgba(5,3,10,.96),rgba(5,3,10,.55),transparent)}
+  .back{color:#fff;text-decoration:none;border:2px solid #7b5d8c;background:#1b1022;padding:7px 9px}
+  .hud{text-align:right;text-shadow:2px 2px #000}
+  .hud strong{color:#ffe351}
+  .overlay{position:absolute;inset:0;z-index:20;background:rgba(4,2,7,.9);display:grid;place-items:center;
+    padding:22px;box-sizing:border-box;text-align:center;color:#fff}
+  .overlay.hidden{display:none}
+  .card{max-width:390px;background:#18101f;border:5px solid #8c69a2;padding:24px;
+    box-shadow:9px 9px 0 #000;box-sizing:border-box}
+  h1{margin:0;color:#ff63b6;font:900 45px/.88 "Courier New",monospace;text-transform:uppercase}
+  h2{margin:12px 0 8px;color:#65e6ff;font:900 19px "Courier New",monospace}
+  p{line-height:1.4}
+  .controls{font:700 12px/1.55 "Courier New",monospace;color:#d7cde0}
+  button{border:0;background:#ffe34f;color:#150b1a;font:900 16px "Courier New",monospace;
+    padding:13px 20px;box-shadow:5px 5px 0 #000;cursor:pointer}
+  .mobile-controls{position:absolute;inset:auto 0 16px;z-index:12;display:none;justify-content:space-between;
+    align-items:end;padding:0 18px;pointer-events:none}
+  .dpad{width:138px;height:138px;position:relative;pointer-events:auto}
+  .dpad button,.water-btn{position:absolute;background:rgba(22,12,30,.78);color:#fff;border:2px solid #8c69a2;
+    box-shadow:none;padding:0;touch-action:none;user-select:none}
+  .dpad button{width:46px;height:46px;font-size:20px}
+  .up{left:46px;top:0}.down{left:46px;bottom:0}.left{left:0;top:46px}.right{right:0;top:46px}
+  .water-btn{position:relative;width:82px;height:82px;border-radius:50%;font:900 13px "Courier New",monospace}
+
+  .ready-overlay{background:rgba(4,2,7,.42);pointer-events:none}
+  .ready-card{text-align:center;transform:translateY(90px)}
+  .ready-word{color:#ffe351;font:900 38px "Courier New",monospace;text-shadow:4px 4px #000}
+  .ready-note{margin-top:8px;color:#fff;font:900 11px "Courier New",monospace;text-shadow:2px 2px #000}
+
+
+  .title-overlay{background:#07040b;z-index:12}
+  .title-card{width:min(86%,420px);text-align:center}
+  .title-kicker{font:900 10px "Courier New",monospace;color:#68e5ff;letter-spacing:2px;margin-bottom:10px}
+  .title-logo{font:900 46px/0.86 "Courier New",monospace;color:#ffe351;text-shadow:5px 5px #7c244f;margin:0 0 18px}
+  .title-walkers{
+    height:96px;
+    position:relative;
+    overflow:hidden;
+    margin:8px 0 18px;
+    border-bottom:3px solid rgba(255,255,255,.18);
+  }
+  .title-walkers img{
+    position:absolute;
+    left:0;
+    bottom:0;
+    display:block;
+    object-fit:contain;
+    max-width:none;
+    will-change:transform;
+    animation-duration:5s;
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+    animation-fill-mode:both;
+  }
+  .title-wp{
+    height:78px;
+    z-index:2;
+    animation-name:titleWpChase;
+  }
+  .title-nathaniel{
+    height:74px;
+    z-index:1;
+    animation-name:titleNathanielChase;
+    animation-delay:1s;
+  }
+  @keyframes titleWpChase{
+    0%{transform:translateX(-100px)}
+    100%{transform:translateX(520px)}
+  }
+  @keyframes titleNathanielChase{
+    0%{transform:translateX(-100px)}
+    100%{transform:translateX(520px)}
+  }
+  .capture-pop{animation:capturePop .32s ease-in-out}
+  @keyframes capturePop{0%{transform:rotate(0deg) scale(1)}60%{transform:rotate(300deg) scale(.55)}100%{transform:rotate(360deg) scale(.05)}}
+  .win-heads{display:flex;justify-content:center;gap:7px;margin:14px 0 8px}
+  .win-head{width:46px;height:46px;object-fit:contain;background:#b8eb57;border-radius:12px;border:2px solid #111}
+  .win-checks{font:900 17px "Courier New",monospace;color:#7cff75;letter-spacing:14px;margin-left:14px}
+
+  @media(max-width:760px),(pointer:coarse){.mobile-controls{display:flex}}
+</style>
+
+<style id="global-tabletop-continuity">
+html,body{min-height:100%;}
+body{
+
+  background-color:#c89b6e;
+  background-image:
+    radial-gradient(ellipse at 18% 11%, rgba(255,255,255,.16), transparent 26%),
+    radial-gradient(ellipse at 78% 92%, rgba(80,39,17,.10), transparent 31%),
+    repeating-linear-gradient(2deg,
+      rgba(92,47,20,.030) 0px,
+      rgba(92,47,20,.030) 1px,
+      transparent 2px,
+      transparent 13px),
+    repeating-linear-gradient(178deg,
+      transparent 0px,
+      transparent 33px,
+      rgba(255,255,255,.026) 34px,
+      transparent 36px,
+      transparent 77px),
+    linear-gradient(104deg,#d9b184 0%,#cfa375 36%,#d5aa7b 62%,#c39467 100%);
+  background-size:auto,auto,100% 27px,100% 91px,auto;
+  background-position:center;
+  background-repeat:no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-attachment:fixed;
+
+}
+</style>
+
+</head>
+<body>
+<div class="arcade-shell">
+  <main class="phone-game">
+    <canvas id="game" width="448" height="704"></canvas>
+    <div class="topbar">
+      <a class="back" href="index.html">← PHONE</a>
+      <div class="hud">SCORE <strong id="score">0000</strong><br>LIVES <strong id="lives">3</strong><br>NATHANIELS <strong id="caught">0/5</strong></div>
+    </div>
+    <div class="scanlines"></div>
+
+    <div class="mobile-controls">
+      <div class="dpad">
+        <button class="up" data-dir="up">▲</button>
+        <button class="down" data-dir="down">▼</button>
+        <button class="left" data-dir="left">◀</button>
+        <button class="right" data-dir="right">▶</button>
+      </div>
+      <button class="water-btn" id="waterBtn">WATER<br>POWER</button>
+    </div>
+
+
+    <section class="overlay title-overlay" id="titlePanel">
+      <div class="title-card">
+        <div class="title-kicker">BAZINGA ARCADE PRESENTS</div>
+        <h1 class="title-logo">NATHANIEL<br>CHASE</h1>
+        <div class="title-walkers">
+          <img class="title-wp" src="assets/images/nathaniel-chase/wind-python-side.png" alt="">
+          <img class="title-nathaniel" src="assets/images/nathaniel-chase/nathaniel-full.png" alt="">
+        </div>
+        <button class="primary-button" id="titleStartButton">PRESS START</button>
+      </div>
+    </section>
+
+    <section class="overlay hidden" id="startPanel">
+      <div class="card">
+        <h1>Nathaniel Chase</h1>
+        <h2>ARCADE PROTOTYPE</h2>
+        <p>Guide Wind Python through the maze, collect Butt Burgers, and catch five Nathaniels.</p>
+        <p>Grab a Butt Burger to activate SPLASH MODE. Catch Nathaniel while he flashes blue. Get five to win.</p>
+        <p class="controls">ARROW KEYS / WASD: MOVE<br>PHONE: USE THE D-PAD</p>
+        <button id="startBtn">START GAME</button>
+      </div>
+    </section>
+
+
+    <section class="overlay hidden ready-overlay" id="readyPanel">
+      <div class="ready-card">
+        <div class="ready-word">READY</div>
+        <div class="ready-note">WIND PYTHON STARTS HERE</div>
+      </div>
+    </section>
+
+    <section class="overlay hidden" id="endPanel">
+      <div class="card">
+        <h1 id="endTitle">GAME OVER</h1>
+        <h2 id="endSub">NATHANIEL CAUGHT WIND PYTHON</h2>
+        <p id="endText">Score: 0</p>
+      <div class="win-heads hidden" id="winHeads">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+      </div>
+      <div class="win-checks hidden" id="winChecks">✓✓✓✓✓</div>
+        <button id="restartBtn">PLAY AGAIN</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+
+  const scoreEl = document.getElementById("score");
+  const livesEl = document.getElementById("lives");
+  const caughtEl = document.getElementById("caught");
+  const titlePanel = document.getElementById("titlePanel");
+  const titleStartButton = document.getElementById("titleStartButton");
+  const startPanel = document.getElementById("startPanel");
+  const readyPanel = document.getElementById("readyPanel");
+
+  const startSound = new Audio("assets/audio/fartmouth.mp3");
+  startSound.preload = "auto";
+  startSound.volume = 0.9;
+
+  const caughtSound = new Audio("assets/audio/oh-no-you-got-me.mp3");
+  caughtSound.preload = "auto";
+  caughtSound.volume = 0.95;
+
+  const loseSound = new Audio("assets/audio/yeah-mad.mp3");
+  loseSound.preload = "auto";
+  loseSound.volume = 0.95;
+
+  const burgerCollectSound = new Audio("assets/audio/butt-burger-collect.mp3");
+  burgerCollectSound.preload = "auto";
+  burgerCollectSound.volume = 0.95;
+
+  const gameMusic = new Audio("assets/audio/nathaniel-game-music.mp3");
+  gameMusic.preload = "auto";
+  gameMusic.loop = true;
+  gameMusic.volume = 0.35;
+  const endPanel = document.getElementById("endPanel");
+  const endTitle = document.getElementById("endTitle");
+  const endSub = document.getElementById("endSub");
+  const endText = document.getElementById("endText");
+  const winHeads = document.getElementById("winHeads");
+  const winChecks = document.getElementById("winChecks");
+
+  const TILE = 32;
+  const COLS = 14;
+  const ROWS = 22;
+  const map = [
+    "##############",
+    "#............#",
+    "#.####.#####.#",
+    "#o#........#o#",
+    "#.#.##.###.#.#",
+    "#............#",
+    "###.##..##.###",
+    "#...#....#...#",
+    "#.#.#.##.#.#.#",
+    "#.#........#.#",
+    "#.####..####.#",
+    "#............#",
+    "#.####..####.#",
+    "#.#........#.#",
+    "#.#.##..##.#.#",
+    "#...#....#...#",
+    "###.##..##.###",
+    "#............#",
+    "#.#####.####.#",
+    "#o..........o#",
+    "#............#",
+    "##############"
+  ];
+
+  const dirs = {
+    left:{x:-1,y:0}, right:{x:1,y:0}, up:{x:0,y:-1}, down:{x:0,y:1}
+  };
+
+  const nathanielImg = new Image();
+  nathanielImg.src = "assets/images/nathaniel-chase/nathaniel-full.png";
+
+  const windPythonImg = new Image();
+  windPythonImg.src = "assets/images/nathaniel-chase/wind-python-side.png";
+
+  const buttBurgerImg = new Image();
+  buttBurgerImg.src = "assets/images/nathaniel-chase/butt-burger.png";
+
+  let pellets, powerups, player, enemies, score, lives, caughtNathaniels, running, powerTimer, lastTime, moveAccumulator, readyTimer, captureAnimations=[];
+
+  function key(x,y){ return x+","+y; }
+  function walkable(x,y){
+    return y>=0 && y<ROWS && x>=0 && x<COLS && map[y][x] !== "#";
+  }
+
+  function resetLevel(full=true){
+    pellets = new Set();
+    powerups = new Set();
+    for(let y=0;y<ROWS;y++){
+      for(let x=0;x<COLS;x++){
+        if(map[y][x]===".") pellets.add(key(x,y));
+        if(map[y][x]==="o") powerups.add(key(x,y));
+      }
+    }
+    player = {x:1,y:1,prevX:1,prevY:1,dir:"right",next:"right",facing:1};
+    enemies = [
+      {x:12,y:20,prevX:12,prevY:20,dir:"left",facing:-1,home:{x:12,y:20},delay:0},
+      {x:12,y:1,prevX:12,prevY:1,dir:"down",facing:-1,home:{x:12,y:1},delay:4},
+      {x:1,y:20,prevX:1,prevY:20,dir:"up",facing:1,home:{x:1,y:20},delay:8}
+    ];
+    powerTimer = 0;
+    moveAccumulator = 0;
+    player.prevX=player.x;
+    player.prevY=player.y;
+    enemies.forEach(e=>{e.prevX=e.x;e.prevY=e.y;});
+    if(full){ score=0; lives=3; caughtNathaniels=0; }
+    updateHud();
+  }
+
+  function updateHud(){
+    scoreEl.textContent=String(score).padStart(4,"0");
+    livesEl.textContent=lives;
+    caughtEl.textContent=caughtNathaniels+"/5";
+  }
+
+  function chooseEnemyDirection(e){
+    const options = Object.entries(dirs)
+      .filter(([name,d]) => walkable(e.x+d.x,e.y+d.y))
+      .filter(([name]) => {
+        const opposite = {left:"right",right:"left",up:"down",down:"up"};
+        return name !== opposite[e.dir] || Math.random()<.08;
+      });
+    if(!options.length) return e.dir;
+
+    const target = powerTimer>0
+      ? {x:COLS-1-player.x,y:ROWS-1-player.y}
+      : player;
+
+    options.sort((a,b)=>{
+      const da=Math.abs(e.x+a[1].x-target.x)+Math.abs(e.y+a[1].y-target.y);
+      const db=Math.abs(e.x+b[1].x-target.x)+Math.abs(e.y+b[1].y-target.y);
+      return da-db+(Math.random()-.5)*2.2;
+    });
+    return options[0][0];
+  }
+
+  function moveEntity(ent,dirName){
+    const d=dirs[dirName];
+    if(walkable(ent.x+d.x,ent.y+d.y)){
+      ent.prevX=ent.x;
+      ent.prevY=ent.y;
+      ent.x+=d.x;
+      ent.y+=d.y;
+      ent.dir=dirName;
+      if(dirName==="left") ent.facing=-1;
+      if(dirName==="right") ent.facing=1;
+      return true;
+    }
+
+    ent.prevX=ent.x;
+    ent.prevY=ent.y;
+    return false;
+  }
+
+  function loseLife(){
+    lives--;
+    updateHud();
+    if(lives<=0){
+      finish(false);
+      return;
+    }
+    player={x:1,y:1,prevX:1,prevY:1,dir:"right",next:"right",facing:1};
+    enemies.forEach((e,i)=>{
+      e.x=e.home.x;e.y=e.home.y;
+      e.prevX=e.home.x;e.prevY=e.home.y;
+      e.dir=i===0?"left":i===1?"down":"up";
+      e.facing=i===0?-1:1;
+      e.delay=i*3;
+    });
+    powerTimer=0;
+  }
+
+  function collisionCheck(){
+    for(const e of enemies){
+      if(e.x===player.x && e.y===player.y){
+        if(powerTimer>0){
+          score+=250;
+          caughtNathaniels++;
+
+          addCaptureAnimation(e.x,e.y,e.facing);
+          caughtSound.pause();
+          caughtSound.currentTime=0;
+          caughtSound.play().catch(()=>{});
+
+          e.x=e.home.x;e.y=e.home.y;e.prevX=e.home.x;e.prevY=e.home.y;e.delay=6;
+          updateHud();
+
+          if(caughtNathaniels>=5){
+            finish(true);
+            return;
+          }
+        } else {
+          loseLife();
+        }
+      }
+    }
+  }
+
+  function playerStep(){
+    if(moveEntity(player,player.next)) player.dir=player.next;
+    else moveEntity(player,player.dir);
+
+    const k=key(player.x,player.y);
+    if(pellets.delete(k)){score+=10;}
+    if(powerups.delete(k)){
+      score+=50;
+      powerTimer=8;
+      burgerCollectSound.pause();
+      burgerCollectSound.currentTime=0;
+      burgerCollectSound.play().catch(()=>{});
+    }
+    updateHud();
+    collisionCheck();
+
+
+  }
+
+  function enemyStep(){
+    enemies.forEach(e=>{
+      if(e.delay>0){e.delay--;return;}
+      const intersections = Object.values(dirs).filter(d=>walkable(e.x+d.x,e.y+d.y)).length;
+      if(intersections>=3 || !moveEntity(e,e.dir)){
+        e.dir=chooseEnemyDirection(e);
+        moveEntity(e,e.dir);
+      }
+    });
+    collisionCheck();
+  }
+
+  function update(dt){
+    if(!running)return;
+    if(powerTimer>0) powerTimer=Math.max(0,powerTimer-dt);
+    moveAccumulator += dt;
+    const stepTime = .23;
+    while(moveAccumulator>=stepTime){
+      moveAccumulator-=stepTime;
+      playerStep();
+      enemyStep();
+      if(!running)break;
+    }
+  }
+
+  function drawMaze(){
+    ctx.fillStyle="#05030a";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    for(let y=0;y<ROWS;y++){
+      for(let x=0;x<COLS;x++){
+        const px=x*TILE,py=y*TILE;
+        if(map[y][x]==="#"){
+          ctx.fillStyle="#2f1740";
+          ctx.fillRect(px,py,TILE,TILE);
+          ctx.strokeStyle="#9b5ac1";
+          ctx.lineWidth=3;
+          ctx.strokeRect(px+2,py+2,TILE-4,TILE-4);
+          ctx.fillStyle="#5d2a75";
+          ctx.fillRect(px+7,py+7,TILE-14,TILE-14);
+        } else {
+          ctx.fillStyle=(x+y)%2===0?"#0b0711":"#0e0815";
+          ctx.fillRect(px,py,TILE,TILE);
+          const k=key(x,y);
+          if(pellets.has(k)){
+            ctx.fillStyle="#ffe65a";
+            ctx.fillRect(px+14,py+14,4,4);
+          }
+          if(powerups.has(k)){
+            const burgerBob=Math.sin(performance.now()/240+(x+y)*0.65)*1.8;
+            if(buttBurgerImg.complete && buttBurgerImg.naturalWidth){
+              const drawWidth=27;
+              const drawHeight=drawWidth*(buttBurgerImg.naturalHeight/buttBurgerImg.naturalWidth);
+              ctx.drawImage(
+                buttBurgerImg,
+                px+16-drawWidth/2,
+                py+16-drawHeight/2+burgerBob,
+                drawWidth,
+                drawHeight
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function smoothStep(t){
+    t=Math.max(0,Math.min(1,t));
+    return t*t*(3-2*t);
+  }
+
+  function renderPosition(ent){
+    const stepTime=.23;
+    const progress=smoothStep(moveAccumulator/stepTime);
+    return {
+      x:ent.prevX+(ent.x-ent.prevX)*progress,
+      y:ent.prevY+(ent.y-ent.prevY)*progress
+    };
+  }
+
+  function drawSprite(image,cx,cy,height,facing,bob=0,frightened=false){
+    if(!(image.complete && image.naturalWidth)) return false;
+
+    const ratio=image.naturalWidth/image.naturalHeight;
+    const width=height*ratio;
+
+    ctx.save();
+    ctx.translate(cx,cy+bob);
+    ctx.scale(facing || 1,1);
+
+    if(frightened){
+      ctx.globalAlpha=.72;
+      ctx.filter="hue-rotate(155deg) saturate(2.4) brightness(1.12)";
+    }
+
+    ctx.drawImage(image,-width/2,-height*.82,width,height);
+    ctx.restore();
+    return true;
+  }
+
+  function drawPlayer(){
+    const pos=renderPosition(player);
+    const cx=pos.x*TILE+16;
+    const cy=pos.y*TILE+18;
+    const bob=running ? Math.sin(performance.now()/130)*0.7 : 0;
+
+    if(!running){
+      ctx.save();
+      ctx.fillStyle="#ffe351";
+      ctx.fillRect(player.x*TILE+3,player.y*TILE+25,TILE-6,4);
+      ctx.fillStyle="#fff";
+      ctx.font='bold 7px "Courier New"';
+      ctx.textAlign="center";
+      ctx.fillText("START",player.x*TILE+16,player.y*TILE+31);
+      ctx.restore();
+    }
+
+    if(!drawSprite(windPythonImg,cx,cy,40,player.facing,bob,false)){
+      ctx.fillStyle="#7bdff5";
+      ctx.beginPath();
+      ctx.arc(cx,cy-7,11,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function addCaptureAnimation(x,y,facing){
+    captureAnimations.push({x,y,facing,start:performance.now(),duration:320});
+  }
+
+  function drawCaptureAnimations(){
+    const now=performance.now();
+    captureAnimations=captureAnimations.filter(anim=>{
+      const t=(now-anim.start)/anim.duration;
+      if(t>=1) return false;
+      const eased=1-Math.pow(1-t,3);
+      const cx=anim.x*TILE+16;
+      const cy=anim.y*TILE+18;
+      const scale=Math.max(.05,1-eased*.95);
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(eased*Math.PI*2);
+      ctx.scale(scale*(anim.facing||1),scale);
+      if(nathanielImg.complete && nathanielImg.naturalWidth){
+        ctx.drawImage(nathanielImg,-22,-22,44,44);
+      }
+      ctx.restore();
+      return true;
+    });
+  }
+
+  function drawEnemy(e,index){
+    const pos=renderPosition(e);
+    const cx=pos.x*TILE+16;
+    const cy=pos.y*TILE+18;
+    const frightened=powerTimer>0;
+    const flashBlue=frightened && Math.floor(performance.now()/170)%2===0;
+    const bob=Math.sin(performance.now()/145+index*1.8)*0.8;
+
+    if(!drawSprite(nathanielImg,cx,cy,43,e.facing,bob,flashBlue)){
+      ctx.fillStyle=flashBlue?"#58ddff":"#d58d55";
+      ctx.beginPath();
+      ctx.arc(cx,cy-8,13,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function draw(){
+    drawMaze();
+    drawPlayer();
+    enemies.forEach(drawEnemy);
+    drawCaptureAnimations();
+
+    if(powerTimer>0){
+      ctx.fillStyle="#7beaff";
+      ctx.font='bold 14px "Courier New"';
+      ctx.fillText("WATER POWER "+powerTimer.toFixed(1),12,canvas.height-15);
+    }
+  }
+
+  function loop(t){
+    const dt=Math.min(.05,(t-lastTime)/1000||0);
+    lastTime=t;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function start(){
+    clearTimeout(readyTimer);
+    captureAnimations=[];
+    caughtSound.pause(); caughtSound.currentTime=0;
+    loseSound.pause(); loseSound.currentTime=0;
+    burgerCollectSound.pause(); burgerCollectSound.currentTime=0;
+    gameMusic.pause();
+    gameMusic.currentTime=0;
+    gameMusic.play().catch(()=>{});
+    resetLevel(true);
+    running=false;
+    startPanel.classList.add("hidden");
+    endPanel.classList.add("hidden");
+    readyPanel.classList.remove("hidden");
+
+    startSound.pause();
+    startSound.currentTime=0;
+    startSound.play().catch(()=>{});
+
+    readyTimer=setTimeout(()=>{
+      readyPanel.classList.add("hidden");
+      moveAccumulator=0;
+      running=true;
+    },1400);
+  }
+
+  function finish(won){
+    if(!running && !endPanel.classList.contains("hidden")) return;
+    running=false;
+
+    gameMusic.pause();
+    gameMusic.currentTime=0;
+
+    endTitle.textContent=won?"NATHANIELS CAPTURED":"GAME OVER";
+    endSub.textContent=won?"5 / 5":"NATHANIEL CAUGHT WIND PYTHON";
+    endText.textContent=won
+      ? "WIND PYTHON ESCAPES... FOR NOW. Score: "+score
+      : "Score: "+score+" · Nathaniels: "+caughtNathaniels+"/5";
+
+    winHeads.classList.toggle("hidden",!won);
+    winChecks.classList.toggle("hidden",!won);
+
+    if(!won){
+      loseSound.pause();
+      loseSound.currentTime=0;
+      loseSound.play().catch(()=>{});
+    }
+
+    endPanel.classList.remove("hidden");
+  }
+
+  function setDirection(dir){ if(dirs[dir]) player.next=dir; }
+
+  addEventListener("keydown",e=>{
+    const mapKeys={
+      ArrowLeft:"left",KeyA:"left",ArrowRight:"right",KeyD:"right",
+      ArrowUp:"up",KeyW:"up",ArrowDown:"down",KeyS:"down"
+    };
+    if(mapKeys[e.code]){e.preventDefault();setDirection(mapKeys[e.code]);}
+  });
+
+  document.querySelectorAll("[data-dir]").forEach(btn=>{
+    const dir=btn.dataset.dir;
+    btn.addEventListener("pointerdown",e=>{e.preventDefault();setDirection(dir);});
+  });
+
+  titleStartButton.addEventListener("click",()=>{
+    titlePanel.classList.add("hidden");
+    startPanel.classList.add("hidden");
+    start();
+  });
+
+  document.getElementById("startBtn").addEventListener("click",start);
+  document.getElementById("restartBtn").addEventListener("click",start);
+  document.getElementById("waterBtn").addEventListener("click",()=>{
+    if(running && powerTimer<=0){
+      // Button is decorative unless a power-up has been collected.
+      endText.textContent="";
+    }
+  });
+
+  resetLevel(true);
+  running=false;
+  requestAnimationFrame(t=>{lastTime=t;loop(t);});
+})();
+</script>
+<script src="cursor.js"></script>
+
+<script>
+document.addEventListener("keydown", function(event){
+  const title = document.getElementById("titlePanel");
+  const button = document.getElementById("titleStartButton");
+  if (title && !title.classList.contains("hidden") && (event.key === "Enter" || event.key === " ")) {
+    event.preventDefault();
+    button.click();
+  }
+});
+</script>
+
+</body>
+</html>
+<style>
+  #startPanel.hidden,
+  #titlePanel.hidden,
+  #readyPanel.hidden,
+  #endPanel.hidden {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  #titleStartButton {
+    position: relative;
+    z-index: 30;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+</style>

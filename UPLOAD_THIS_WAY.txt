@@ -1,0 +1,30 @@
+WIND PYTHON GITHUB UPLOAD
+
+Open this extracted folder.
+
+Upload the CONTENTS inside this folder to the root of your GitHub repository.
+
+Correct repository layout:
+
+index.html
+styles.css
+script.js
+cursor.js
+episodes.html
+shop.html
+meat-ups.html
+nathaniel-chase.html
+assets/
+  images/
+  audio/
+
+IMPORTANT:
+Do not upload the outer folder as a single folder inside the repository.
+The assets folder must sit beside index.html, not inside another WindPython folder.
+
+After uploading:
+1. Open the repository.
+2. Confirm index.html and assets are visible on the same screen.
+3. Open assets, then images, and confirm the pictures are visible.
+4. Wait for GitHub Pages to deploy.
+5. Refresh the live site with Ctrl + F5.

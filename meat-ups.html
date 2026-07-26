@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meat Ups | Wind Python</title>
+  <meta name="description" content="The Wind Python universe inside a phone.">
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .meatups-app {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #f8d0dc;
+      color: #161116;
+      display: grid;
+      grid-template-rows: 30px 54px minmax(0, 1fr) 104px;
+    }
+
+    .meatups-status {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
+      padding: 8px 18px 0;
+      font-size: 10px;
+      font-weight: 900;
+      z-index: 5;
+    }
+
+    .meatups-status span:last-child {
+      justify-self: end;
+    }
+
+    .meatups-back {
+      position: absolute;
+      left: 13px;
+      top: 37px;
+      z-index: 8;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      text-decoration: none;
+      color: #111;
+      background: rgba(255,255,255,.52);
+      border: 2px solid rgba(0,0,0,.12);
+      font-size: 27px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .meatups-app-header {
+      display: grid;
+      place-items: center;
+      padding: 0 62px 2px;
+      overflow: hidden;
+    }
+
+    .meatups-app-header img {
+      width: 100%;
+      max-width: 182px;
+      height: 50px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+
+    .meatups-card-stage {
+      position: relative;
+      min-height: 0;
+      margin: -2px 16px 0;
+      touch-action: none;
+    }
+
+    .meatups-profile-card {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border: 3px solid #171117;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 5px 7px 0 rgba(22,17,22,.18);
+      transform-origin: 50% 100%;
+      transition: transform 220ms ease, opacity 220ms ease;
+      user-select: none;
+    }
+
+    .meatups-profile-card:nth-last-of-type(2) {
+      transform: scale(.97) translateY(7px);
+      opacity: .78;
+    }
+
+    .meatups-profile-card:nth-last-of-type(3) {
+      transform: scale(.94) translateY(14px);
+      opacity: .52;
+    }
+
+    .meatups-photo {
+      width: 100%;
+      height: 50%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      border-bottom: 3px solid #171117;
+    }
+
+    .meatups-profile-card[data-name="Jamie Harding"] .meatups-photo {
+      object-position: 52% 38%;
+    }
+
+    .meatups-profile-card[data-name="Spencer McAllon"] .meatups-photo {
+      object-position: center 35%;
+    }
+
+    .meatups-profile-card[data-name="Drew Mahaffey"] .meatups-photo {
+      object-position: center 32%;
+    }
+
+    .meatups-profile-copy {
+      height: 50%;
+      padding: 11px 14px 12px;
+      background: #fff7f9;
+      box-sizing: border-box;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .meatups-profile-copy h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+
+    .meatups-profile-copy p {
+      margin: 7px 0 0;
+      font-size: 11.5px;
+      line-height: 1.34;
+      color: #4b3b43;
+      overflow-wrap: anywhere;
+    }
+
+    .meatups-stamp {
+      position: absolute;
+      top: 19px;
+      z-index: 3;
+      padding: 5px 8px 4px;
+      border: 3px solid currentColor;
+      border-radius: 7px;
+      font-size: 22px;
+      font-weight: 1000;
+      letter-spacing: .04em;
+      opacity: 0;
+    }
+
+    .meatups-stamp.yes {
+      left: 13px;
+      color: #39bd6f;
+      transform: rotate(-10deg);
+    }
+
+    .meatups-stamp.no {
+      right: 13px;
+      color: #e34c65;
+      transform: rotate(10deg);
+    }
+
+    .meatups-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 38px;
+      padding: 12px 0 18px;
+      box-sizing: border-box;
+    }
+
+    .meatups-action {
+      width: 51px;
+      height: 51px;
+      border-radius: 50%;
+      border: 3px solid #171117;
+      background: #fff;
+      font-size: 27px;
+      font-weight: 1000;
+      box-shadow: 3px 4px 0 rgba(22,17,22,.18);
+    }
+
+    .meatups-action.reject { color: #df455e; }
+    .meatups-action.accept { color: #35b968; }
+
+    .meatups-action:active {
+      transform: translateY(2px) scale(.95);
+      box-shadow: 1px 2px 0 rgba(22,17,22,.18);
+    }
+
+    .meatups-empty {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: none;
+      place-items: center;
+      border: 3px solid #171117;
+      border-radius: 20px;
+      text-align: center;
+      padding: 24px;
+      background: #fff7f9;
+      box-shadow: 5px 7px 0 rgba(22,17,22,.18);
+    }
+
+    .meatups-empty.show { display: grid; }
+
+    .meatups-empty strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1.05;
+    }
+
+    .meatups-empty p {
+      margin: 8px 0 16px;
+      font-size: 13px;
+    }
+
+    .meatups-empty button {
+      border: 3px solid #171117;
+      border-radius: 999px;
+      padding: 9px 14px;
+      background: #ef9ebc;
+      font-weight: 900;
+      box-shadow: 2px 3px 0 rgba(22,17,22,.18);
+    }
+
+    @media (max-height: 760px) {
+      .meatups-app {
+        grid-template-rows: 26px 52px minmax(0,1fr) 98px;
+      }
+
+      .meatups-app-header img {
+        height: 44px;
+      }
+
+      .meatups-action {
+        width: 45px;
+        height: 45px;
+      }
+    }
+  
+    .meatups-match-overlay,
+    .meatups-message-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+    }
+
+    .meatups-match-overlay.show,
+    .meatups-message-screen.show {
+      display: grid;
+    }
+
+    .meatups-match-overlay {
+      place-items: center;
+      padding: 30px;
+      text-align: center;
+      background: rgba(243,196,212,.96);
+    }
+
+    .meatups-match-card {
+      width: 100%;
+      padding: 26px 20px 22px;
+      border: 3px solid #171117;
+      border-radius: 24px;
+      background: #fff7f9;
+      box-shadow: 5px 7px 0 rgba(22,17,22,.18);
+    }
+
+    .meatups-match-card img {
+      width: 92px;
+      height: 92px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #171117;
+      margin-bottom: 15px;
+    }
+
+    .meatups-match-card h2 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .meatups-match-card p {
+      margin: 10px 0 18px;
+      font-size: 13px;
+    }
+
+    .meatups-match-card button {
+      border: 3px solid #171117;
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: #ef9ebc;
+      font-weight: 900;
+      box-shadow: 2px 3px 0 rgba(22,17,22,.18);
+    }
+
+    .meatups-message-screen {
+      grid-template-rows: 72px 1fr 58px;
+      background: #fff7f9;
+    }
+
+    .meatups-message-header {
+      display: grid;
+      grid-template-columns: 36px 46px 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 14px 10px;
+      border-bottom: 3px solid #171117;
+      background: #efb4c8;
+    }
+
+    .meatups-message-back {
+      border: 0;
+      background: transparent;
+      font-size: 29px;
+      font-weight: 900;
+    }
+
+    .meatups-message-header img {
+      width: 42px;
+      height: 42px;
+      object-fit: cover;
+      border: 2px solid #171117;
+      border-radius: 50%;
+    }
+
+    .meatups-message-header strong {
+      font-size: 17px;
+    }
+
+    .meatups-thread {
+      padding: 18px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background:
+        linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.6)),
+        repeating-linear-gradient(0deg, transparent 0 21px, rgba(0,0,0,.025) 21px 22px);
+    }
+
+    .meatups-message-bubble {
+      max-width: 78%;
+      padding: 10px 12px;
+      border: 2px solid #171117;
+      font-size: 13px;
+      line-height: 1.35;
+      box-shadow: 2px 3px 0 rgba(22,17,22,.12);
+      animation: meatups-bubble-in .35s ease both;
+      overflow-wrap: anywhere;
+    }
+
+    .meatups-message-bubble.bazinga {
+      align-self: flex-start;
+      border-radius: 16px 16px 16px 4px;
+      background: white;
+    }
+
+    .meatups-message-bubble.user {
+      align-self: flex-end;
+      border-radius: 16px 16px 4px 16px;
+      background: #efb4c8;
+    }
+
+    .meatups-typing {
+      align-self: flex-start;
+      display: none;
+      padding: 8px 12px;
+      border: 2px solid #171117;
+      border-radius: 16px 16px 16px 4px;
+      background: white;
+      font-size: 12px;
+      letter-spacing: .12em;
+      box-shadow: 2px 3px 0 rgba(22,17,22,.12);
+    }
+
+    .meatups-typing.show {
+      display: block;
+    }
+
+    @keyframes meatups-bubble-in {
+      from { opacity: 0; transform: translateY(8px) scale(.96); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .meatups-compose {
+      display: grid;
+      grid-template-columns: 1fr 38px;
+      gap: 8px;
+      padding: 9px 12px;
+      border-top: 3px solid #171117;
+      background: #efb4c8;
+    }
+
+    .meatups-compose input {
+      min-width: 0;
+      border: 2px solid #171117;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: white;
+      font-size: 12px;
+    }
+
+    .meatups-compose button {
+      border: 2px solid #171117;
+      border-radius: 50%;
+      background: white;
+      font-weight: 900;
+    }
+
+  </style>
+
+
+<style id="global-tabletop-continuity">
+html,body{min-height:100%;}
+body{
+
+  background-color:#c89b6e;
+  background-image:
+    radial-gradient(ellipse at 18% 11%, rgba(255,255,255,.16), transparent 26%),
+    radial-gradient(ellipse at 78% 92%, rgba(80,39,17,.10), transparent 31%),
+    repeating-linear-gradient(2deg,
+      rgba(92,47,20,.030) 0px,
+      rgba(92,47,20,.030) 1px,
+      transparent 2px,
+      transparent 13px),
+    repeating-linear-gradient(178deg,
+      transparent 0px,
+      transparent 33px,
+      rgba(255,255,255,.026) 34px,
+      transparent 36px,
+      transparent 77px),
+    linear-gradient(104deg,#d9b184 0%,#cfa375 36%,#d5aa7b 62%,#c39467 100%);
+  background-size:auto,auto,100% 27px,100% 91px,auto;
+  background-position:center;
+  background-repeat:no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-attachment:fixed;
+
+}
+</style>
+
+</head>
+<body>
+  <main class="stage">
+    <div class="desk-items" aria-hidden="true">
+      <div class="desk-note">
+        <span>BAZINGA</span>
+        <small>don't delete<br>Rodney files</small>
+      </div>
+
+      <div class="desk-pencil">
+        <span class="pencil-tip"></span>
+        <span class="pencil-body"></span>
+        <span class="pencil-band"></span>
+        <span class="pencil-eraser"></span>
+      </div>
+<div class="desk-pcb">
+        <span class="pcb-chip chip-a"></span>
+        <span class="pcb-chip chip-b"></span>
+        <span class="pcb-line line-a"></span>
+        <span class="pcb-line line-b"></span>
+        <span class="pcb-node node-a"></span>
+        <span class="pcb-node node-b"></span>
+        <span class="pcb-node node-c"></span>
+      </div>
+
+
+</div>
+
+    <section class="phone" aria-label="Wind Python phone">
+      <div class="phone-screen">
+
+        <section class="meatups-app" aria-label="Meat Ups dating game">
+          <div class="meatups-status">
+            <span>WP</span>
+            <span>MEAT UPS</span>
+            <span>69% ▰</span>
+          </div>
+
+          <a class="meatups-back" href="index.html" aria-label="Return to BazingaOS">‹</a>
+
+          <header class="meatups-app-header">
+            <img src="assets/images/meat-ups/meat-ups-header.png" alt="Meat Ups">
+          </header>
+
+          <section class="meatups-card-stage" id="meatupsStage">
+            <div class="meatups-empty" id="emptyState">
+              <div>
+                <strong>NO MORE MEAT NEARBY</strong>
+                <p>The fridge is empty.</p>
+                <button id="restartBtn" type="button">START AGAIN</button>
+              </div>
+            </div>
+          </section>
+
+          <nav class="meatups-actions" aria-label="Swipe controls">
+            <button class="meatups-action reject" id="nopeButton" type="button" aria-label="Nope">×</button>
+            <button class="meatups-action accept" id="meatButton" type="button" aria-label="Let's Meat Up">♥</button>
+          </nav>
+
+          <div class="meatups-match-overlay" id="matchOverlay">
+            <div class="meatups-match-card">
+              <img src="assets/images/meat-ups/bazinga.jpg" alt="Bazinga">
+              <h2>LET'S MEAT UP!</h2>
+              <p>Bazinga wants to meat up.</p>
+              <button id="openMessagesBtn" type="button">READ MESSAGE</button>
+            </div>
+          </div>
+
+          <section class="meatups-message-screen" id="messageScreen" aria-label="Messages with Bazinga">
+            <header class="meatups-message-header">
+              <button class="meatups-message-back" id="messageBackBtn" type="button" aria-label="Back">‹</button>
+              <img src="assets/images/meat-ups/bazinga.jpg" alt="Bazinga">
+              <strong>Bazinga</strong>
+            </header>
+            <div class="meatups-thread" id="messageThread">
+              <div class="meatups-message-bubble bazinga">
+                Thanks for swiping right.
+              </div>
+              <div class="meatups-typing" id="typingIndicator">•••</div>
+            </div>
+            <div class="meatups-compose">
+              <input id="messageInput" type="text" placeholder="Write a message..." aria-label="Write a message" autocomplete="off">
+              <button id="sendMessageBtn" type="button" aria-label="Send message">›</button>
+            </div>
+          </section>
+
+        </section>
+
+      </div>
+    </section>
+  </main>
+
+  
+  
+
+  <script>
+    const profiles = [
+{
+        name: "Jamie Harding",
+        image: "assets/images/meat-ups/jamie-harding.jpg",
+        description: "Looking for more than a one-night thing. Love my cat Cassie and walks along the beach. I’m pansexual and keen to make some genuine connections. I also have red hair."
+      },
+      {
+        name: "Spencer McAllon",
+        image: "assets/images/meat-ups/spencer-mcallon.jpg",
+        description: "Friends call me Rainbow Dragon, not sure why. I kind of look like a reptilian of some sort, but I’m actually human. Love meeting new guys in my area. If you’re lucky, I might even send you the photo without my towel ;)"
+      },
+      {
+        name: "Drew Mahaffey",
+        image: "assets/images/meat-ups/drew-mahaffey.jpg",
+        description: "I like my men like my eyebrows: stern and bushy. I love golf, my best friend Forrest, and I’m an electrical engineer who just recently got promoted too. I am the big dog you pups have been looking for. Woof woof."
+      },
+      {
+        name: "Bazinga, 33",
+        image: "assets/images/meat-ups/bazinga.jpg",
+        description: "Computer enthusiast. Gadget genius. Looking for a serious meat connection.",
+        match: true
+      },
+
+    ];
+
+    const stage = document.getElementById("meatupsStage");
+    const emptyState = document.getElementById("emptyState");
+    const nopeButton = document.getElementById("nopeButton");
+    const meatButton = document.getElementById("meatButton");
+    const restartButton = document.getElementById("restartBtn");
+    const matchOverlay = document.getElementById("matchOverlay");
+    const messageScreen = document.getElementById("messageScreen");
+    const openMessagesBtn = document.getElementById("openMessagesBtn");
+    const messageBackBtn = document.getElementById("messageBackBtn");
+    const messageThread = document.getElementById("messageThread");
+    const messageInput = document.getElementById("messageInput");
+    const sendMessageBtn = document.getElementById("sendMessageBtn");
+    const typingIndicator = document.getElementById("typingIndicator");
+
+    let activeCard = null;
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+
+    function buildDeck() {
+      stage.querySelectorAll(".meatups-profile-card").forEach(card => card.remove());
+      emptyState.classList.remove("show");
+
+      profiles.slice().reverse().forEach(profile => {
+        const card = document.createElement("article");
+        card.className = "meatups-profile-card";
+        card.dataset.name = profile.name;
+        card.dataset.match = profile.match ? "true" : "false";
+        card.innerHTML = `
+          <img class="meatups-photo" src="${profile.image}" alt="${profile.name}">
+          <div class="meatups-stamp yes">LET'S MEAT UP</div>
+          <div class="meatups-stamp no">NOPE</div>
+          <div class="meatups-profile-copy">
+            <h1>${profile.name}</h1>
+            <p>${profile.description}</p>
+          </div>
+        `;
+        stage.appendChild(card);
+      });
+
+      bindTopCard();
+      updateButtons();
+    }
+
+    function topCard() {
+      const cards = stage.querySelectorAll(".meatups-profile-card");
+      return cards[cards.length - 1] || null;
+    }
+
+    function bindTopCard() {
+      activeCard = topCard();
+
+      if (!activeCard) {
+        emptyState.classList.add("show");
+        updateButtons();
+        return;
+      }
+
+      activeCard.addEventListener("pointerdown", startDrag);
+    }
+
+    function startDrag(event) {
+      if (!activeCard) return;
+      dragging = true;
+      startX = event.clientX;
+      currentX = 0;
+      activeCard.setPointerCapture(event.pointerId);
+      activeCard.style.transition = "none";
+      activeCard.addEventListener("pointermove", dragCard);
+      activeCard.addEventListener("pointerup", endDrag);
+      activeCard.addEventListener("pointercancel", endDrag);
+    }
+
+    function dragCard(event) {
+      if (!dragging || !activeCard) return;
+
+      currentX = event.clientX - startX;
+      const turn = currentX / 22;
+      const stampOpacity = Math.min(Math.abs(currentX) / 70, 1);
+
+      activeCard.style.transform = `translateX(${currentX}px) rotate(${turn}deg)`;
+      activeCard.querySelector(".yes").style.opacity = currentX > 0 ? stampOpacity : 0;
+      activeCard.querySelector(".no").style.opacity = currentX < 0 ? stampOpacity : 0;
+    }
+
+    function endDrag(event) {
+      if (!activeCard) return;
+      dragging = false;
+      activeCard.releasePointerCapture?.(event.pointerId);
+      activeCard.removeEventListener("pointermove", dragCard);
+      activeCard.removeEventListener("pointerup", endDrag);
+      activeCard.removeEventListener("pointercancel", endDrag);
+
+      if (Math.abs(currentX) > 72) {
+        swipe(currentX > 0 ? 1 : -1);
+      } else {
+        activeCard.style.transition = "transform 190ms ease";
+        activeCard.style.transform = "";
+        activeCard.querySelector(".yes").style.opacity = 0;
+        activeCard.querySelector(".no").style.opacity = 0;
+      }
+    }
+
+    function swipe(direction) {
+      if (!activeCard) return;
+
+      const card = activeCard;
+      const isBazingaMatch = direction > 0 && card.dataset.match === "true";
+
+      card.querySelector(direction > 0 ? ".yes" : ".no").style.opacity = 1;
+      card.style.transition = "transform 245ms ease, opacity 245ms ease";
+      card.style.transform = `translateX(${direction * 520}px) rotate(${direction * 22}deg)`;
+      card.style.opacity = 0;
+      activeCard = null;
+      updateButtons();
+
+      setTimeout(() => {
+        card.remove();
+
+        if (isBazingaMatch) {
+          window.setTimeout(() => {
+            matchOverlay.classList.add("show");
+
+            window.setTimeout(() => {
+              matchOverlay.classList.remove("show");
+              messageScreen.classList.add("show");
+              messageInput.focus();
+            }, 1300);
+          }, 700);
+          return;
+        }
+
+        bindTopCard();
+        updateButtons();
+      }, 255);
+    }
+
+    function updateButtons() {
+      const disabled = !topCard();
+      nopeButton.disabled = disabled;
+      meatButton.disabled = disabled;
+      nopeButton.style.opacity = disabled ? ".35" : "1";
+      meatButton.style.opacity = disabled ? ".35" : "1";
+    }
+
+    nopeButton.addEventListener("click", () => swipe(-1));
+    meatButton.addEventListener("click", () => swipe(1));
+    restartButton.addEventListener("click", buildDeck);
+
+    openMessagesBtn.addEventListener("click", () => {
+      matchOverlay.classList.remove("show");
+      messageScreen.classList.add("show");
+      messageInput.focus();
+    });
+
+    messageBackBtn.addEventListener("click", () => {
+      messageScreen.classList.remove("show");
+      bindTopCard();
+      updateButtons();
+    });
+
+
+    const bazingaReplies = [
+      "Wind Python said I should give this another chance.",
+      "He's my best mate.",
+      "He doesn't really talk much.",
+      "Meat me at the Docking Iguana tonight at 9 PM.",
+      "Sebastian Glitterdick is performing.",
+      "Wind Python should be there too.",
+      "Don't be late.",
+      "I'll save you a seat.",
+      "The chips are surprisingly good.",
+      "Don't tell anyone I met you through Meat Ups."
+    ];
+
+    let bazingaReplyIndex = 0;
+    let bazingaReplyPending = false;
+
+    function addMessage(text, sender) {
+      const bubble = document.createElement("div");
+      bubble.className = `meatups-message-bubble ${sender}`;
+      bubble.textContent = text;
+      messageThread.insertBefore(bubble, typingIndicator);
+      messageThread.scrollTop = messageThread.scrollHeight;
+    }
+
+    function chooseBazingaReply(message) {
+      const lower = message.toLowerCase();
+
+      if (/(^|\s)(bye|goodbye|cya)(\s|$)|see ya|see you|catch you|talk later|talk soon|gotta go|have to go|goodnight|good night|farewell/i.test(lower)) {
+        const farewells = [
+          "Goodbye.",
+          "See you tonight.",
+          "Catch you at the Docking Iguana.",
+          "See you at 9.",
+          "Later.",
+          "Take care.",
+          "Wind Python and I'll be there.",
+          "Don't be late."
+        ];
+        return farewells[Math.floor(Math.random() * farewells.length)];
+      }
+
+      if (lower.includes("wind python")) {
+        return "He's my best mate. He doesn't really talk much.";
+      }
+
+      if (
+        lower.includes("where") ||
+        lower.includes("docking") ||
+        lower.includes("iguana")
+      ) {
+        return "The Docking Iguana. Tonight at 9 PM.";
+      }
+
+      if (
+        lower.includes("who") &&
+        lower.includes("sebastian")
+      ) {
+        return "Sebastian Glitterdick. He's performing tonight.";
+      }
+
+      if (
+        lower.includes("when") ||
+        lower.includes("time")
+      ) {
+        return "9 PM. Don't be late.";
+      }
+
+      if (
+        lower.includes("why") ||
+        lower.includes("what's happening") ||
+        lower.includes("whats happening")
+      ) {
+        return "Sebastian Glitterdick is performing. Wind Python should be there too.";
+      }
+
+      if (
+        lower.includes("hello") ||
+        lower.includes("hey") ||
+        lower.includes("hi")
+      ) {
+        return bazingaReplyIndex === 0
+          ? "Wind Python said I should give this another chance."
+          : "Hello again.";
+      }
+
+      if (
+        lower.includes("yes") ||
+        lower.includes("sure") ||
+        lower.includes("okay") ||
+        lower.includes("sounds good")
+      ) {
+        return "Good. Meat me at the Docking Iguana tonight at 9 PM.";
+      }
+
+      return bazingaReplies[Math.min(bazingaReplyIndex++, bazingaReplies.length - 1)];
+    }
+
+    function sendUserMessage() {
+      const text = messageInput.value.trim();
+
+      if (!text || bazingaReplyPending) return;
+
+      addMessage(text, "user");
+      messageInput.value = "";
+      bazingaReplyPending = true;
+      typingIndicator.classList.add("show");
+      messageThread.scrollTop = messageThread.scrollHeight;
+
+      const reply = chooseBazingaReply(text);
+
+      window.setTimeout(() => {
+        typingIndicator.classList.remove("show");
+        addMessage(reply, "bazinga");
+        bazingaReplyPending = false;
+        messageInput.focus();
+      }, 750);
+    }
+
+    sendMessageBtn.addEventListener("click", sendUserMessage);
+
+    messageInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendUserMessage();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "ArrowLeft") swipe(-1);
+      if (event.key === "ArrowRight") swipe(1);
+    });
+
+    buildDeck();
+  </script>
+  <script src="cursor.js"></script>
+
+</body>
+</html>

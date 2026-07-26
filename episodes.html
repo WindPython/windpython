@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wind Python Episodes</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  
+  background-color:#c89b6e;
+  background-image:
+    radial-gradient(ellipse at 18% 11%, rgba(255,255,255,.16), transparent 26%),
+    radial-gradient(ellipse at 78% 92%, rgba(80,39,17,.10), transparent 31%),
+    repeating-linear-gradient(2deg,
+      rgba(92,47,20,.030) 0px,
+      rgba(92,47,20,.030) 1px,
+      transparent 2px,
+      transparent 13px),
+    repeating-linear-gradient(178deg,
+      transparent 0px,
+      transparent 33px,
+      rgba(255,255,255,.026) 34px,
+      transparent 36px,
+      transparent 77px),
+    linear-gradient(104deg,#d9b184 0%,#cfa375 36%,#d5aa7b 62%,#c39467 100%);
+  background-size:auto,auto,100% 27px,100% 91px,auto;
+  background-position:center;
+  background-repeat:no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-attachment:fixed;
+
+  display:grid;
+  place-items:center;
+  padding:24px;
+  overflow:hidden;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+}
+.episode-stage{
+  width:100%;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  position:relative;
+}
+.landscape-phone{
+  width:min(950px,92vw);
+  aspect-ratio:16/9;
+  position:relative;
+  padding:14px;
+  border:7px solid #151419;
+  border-radius:54px;
+  background:#2a292d;
+  box-shadow:0 24px 35px rgba(48,24,12,.32),inset 0 0 0 2px #45434a;
+}
+.landscape-screen{
+  width:100%;height:100%;
+  position:relative;
+  overflow:hidden;
+  border-radius:38px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,255,255,.12),transparent 36%),
+    linear-gradient(145deg,#30243d,#16111d 68%,#09070d);
+  border:2px solid #050505;
+}
+.phone-speaker{
+  position:absolute;left:50%;top:4px;transform:translateX(-50%);
+  width:96px;height:7px;border-radius:8px;background:#090909;z-index:9;
+}
+.phone-camera{
+  position:absolute;left:calc(50% + 67px);top:4px;
+  width:8px;height:8px;border-radius:50%;background:#10232b;z-index:9;
+}
+.desktop{
+  height:100%;
+  padding:34px 34px 24px;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  gap:18px;
+}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-shadow:4px 4px #8d315d}
+.subtitle{margin:9px 0 0;color:#ddd3e2;font:700 11px "Courier New",monospace}
+.home{color:white;text-decoration:none;font:900 10px "Courier New",monospace;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:9px 12px;background:rgba(0,0,0,.25)}
+.apps{
+  align-self:center;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(90px,1fr));
+  gap:clamp(12px,2.5vw,30px);
+}
+.episode-app{appearance:none;border:0;background:none;color:white;padding:0;cursor:none;font:inherit;text-align:center}
+.floppy{
+  display:block;
+  --disk:#557db4;--tilt:-2deg;
+  width:clamp(82px,11vw,125px);
+  aspect-ratio:1/1.04;
+  margin:0 auto 10px;
+  position:relative;
+  border-radius:9px;
+  background:var(--disk);
+  border:3px solid rgba(0,0,0,.58);
+  box-shadow:0 9px 16px rgba(0,0,0,.36),inset 0 2px rgba(255,255,255,.22),inset 0 -5px rgba(0,0,0,.18);
+  transition:transform .13s ease,filter .13s ease;
+}
+.floppy:before{
+  content:"";position:absolute;left:17%;right:17%;top:0;height:37%;
+  background:#d7d7d7;border:2px solid rgba(0,0,0,.45);border-top:0;border-radius:0 0 5px 5px;
+}
+.floppy:after{
+  content:"";position:absolute;left:12%;right:12%;bottom:9%;height:39%;
+  background:#f2e7c7;border:2px solid rgba(0,0,0,.42);transform:rotate(var(--tilt));
+}
+.window{display:block;position:absolute;z-index:2;top:7%;left:50%;transform:translateX(-50%);width:24%;height:22%;background:#202020;border:2px solid #777}
+.num{display:block;position:absolute;z-index:3;left:50%;bottom:18%;transform:translateX(-50%) rotate(var(--tilt));color:#302a23;font:900 clamp(14px,2vw,24px) "Courier New",monospace}
+.label{display:block;font:900 clamp(8px,1.1vw,12px) "Courier New",monospace;text-transform:uppercase;text-shadow:2px 2px #000}
+.episode-app:hover .floppy{transform:translateY(-5px) scale(1.04);filter:brightness(1.08)}
+.episode-app:active .floppy{transform:scale(.94)}
+.ep2 .floppy{--disk:#aa5872;--tilt:1.5deg}.ep3 .floppy{--disk:#5f9a70;--tilt:-1deg}.ep4 .floppy{--disk:#b8833f;--tilt:2deg}.ep5 .floppy{--disk:#7458a4;--tilt:-1.5deg}
+.hint{text-align:center;color:#92e8ff;font:900 9px "Courier New",monospace;letter-spacing:1px}
+.viewer{position:absolute;inset:0;z-index:20;padding:22px;display:grid;grid-template-rows:auto 1fr auto;gap:11px;background:#050505;animation:open .2s ease}
+.viewer.hidden{display:none}
+@keyframes open{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+.viewer-top{display:flex;align-items:center;justify-content:space-between}
+.viewer-title{color:#f4d35e;font:900 14px "Courier New",monospace}
+.close{appearance:none;border:1px solid rgba(255,255,255,.3);border-radius:9px;background:#1b171e;color:white;padding:8px 11px;font:900 10px "Courier New",monospace;cursor:none}
+.video{display:grid;place-items:center;min-height:0;border-radius:14px;border:2px solid #28232c;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0,rgba(255,255,255,.018) 1px,transparent 1px,transparent 3px),#020202;box-shadow:inset 0 0 42px #000;overflow:hidden}
+.placeholder{text-align:center;padding:20px}
+.big-num{display:block;color:#f4d35e;font:900 clamp(60px,10vw,115px) "Courier New",monospace;line-height:.8;text-shadow:6px 6px #8d315d}
+.ep-title{display:block;margin-top:20px;color:white;font:900 clamp(16px,2.5vw,28px) "Courier New",monospace;letter-spacing:2px}
+.coming{display:block;margin-top:10px;color:#85ecff;font:900 10px "Courier New",monospace}
+.viewer-foot{display:flex;justify-content:space-between;color:#908a96;font:900 9px "Courier New",monospace}
+@media(max-width:700px){
+ body{padding:8px}
+ .landscape-phone{width:99vw;padding:9px;border-width:5px;border-radius:28px}
+ .landscape-screen{border-radius:18px}
+ .desktop{padding:25px 14px 14px;gap:8px}
+ .subtitle,.hint{display:none}
+ .apps{gap:6px}
+ .floppy{width:min(78px,16vw);border-width:2px}
+ .home{padding:7px 8px;font-size:8px}
+}
+
+.episode-runtime{position:absolute;inset:0;z-index:80;display:none;padding:22px;background:linear-gradient(145deg,#1b1721,#08070b 75%);overflow:hidden}
+.episode-runtime.active{display:grid}
+.runtime-panel{width:100%;height:100%;min-height:0;display:grid;grid-template-rows:auto 1fr auto;gap:12px;border:2px solid rgba(130,231,255,.25);border-radius:18px;padding:16px;background:#0b0e12;box-shadow:inset 0 0 40px rgba(0,0,0,.8);overflow:hidden}
+.runtime-header,.runtime-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;color:#91e7ff;font:900 10px "Courier New",monospace;letter-spacing:1px}
+.runtime-back{border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 10px;background:#17131b;color:#fff;font:900 9px "Courier New",monospace;cursor:none}
+.runtime-stage{position:relative;min-height:0;display:grid;place-items:center;overflow:hidden;border:2px solid rgba(255,255,255,.13);border-radius:13px;background:#020304}
+.file-loader{width:min(520px,88%);display:grid;gap:16px;color:#d7f8ff;font:900 12px "Courier New",monospace}
+.loader-title{color:#f5d76e;font-size:clamp(18px,3vw,28px);letter-spacing:2px}
+.loader-file{color:#ff9ec8}.loader-status{min-height:18px;color:#91e7ff}
+.loader-track{width:100%;height:18px;padding:3px;border:2px solid #91e7ff;background:#071015}
+.loader-fill{width:0;height:100%;background:repeating-linear-gradient(90deg,#91e7ff 0 12px,#d8f8ff 12px 18px);transition:width .28s steps(6,end)}
+.loader-percent{color:#f5d76e;text-align:right}
+.crt-flash{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;background:#fff}
+.crt-flash.go{animation:crtFlash .55s steps(3,end)}
+@keyframes crtFlash{0%{opacity:0;transform:scaleY(1)}15%{opacity:.95;transform:scaleY(.03)}35%{opacity:.18;transform:scaleY(1)}58%{opacity:.65;transform:scaleY(.08)}100%{opacity:0;transform:scaleY(1)}}
+.youtube-shell{position:absolute;inset:0;display:none;background:#000}.youtube-shell.active{display:block}
+.youtube-shell iframe{width:100%;height:100%;border:0;display:block}
+.locked-episode{position:relative;opacity:.62}.locked-episode::after{content:"LOCKED";position:absolute;right:3px;top:3px;padding:3px 5px;border:1px solid rgba(255,255,255,.25);border-radius:5px;background:rgba(8,7,11,.82);color:#ff9ec8;font:900 7px "Courier New",monospace}
+
+</style>
+</head>
+<body>
+<main class="episode-stage">
+<section class="landscape-phone" aria-label="Wind Python landscape phone">
+<div class="phone-speaker"></div><div class="phone-camera"></div>
+<div class="landscape-screen">
+<div class="desktop">
+<header class="topbar">
+<div><h1>WIND PYTHON<br>EPISODES</h1><p class="subtitle">Tap a floppy disk to load an episode.</p></div>
+<a class="home" href="index.html">HOME</a>
+</header>
+<div class="apps">
+<button class="episode-app ep1" data-episode="1" data-title="Waiting Room"><span class="floppy"><span class="window"></span><span class="num">01</span></span><span class="label">Episode One</span></button><button class="episode-app ep2" data-episode="2" data-title="Episode Two"><span class="floppy"><span class="window"></span><span class="num">02</span></span><span class="label">Episode Two</span></button><button class="episode-app ep3" data-episode="3" data-title="Episode Three"><span class="floppy"><span class="window"></span><span class="num">03</span></span><span class="label">Episode Three</span></button><button class="episode-app ep4" data-episode="4" data-title="Episode Four"><span class="floppy"><span class="window"></span><span class="num">04</span></span><span class="label">Episode Four</span></button><button class="episode-app ep5" data-episode="5" data-title="Episode Five"><span class="floppy"><span class="window"></span><span class="num">05</span></span><span class="label">Episode Five</span></button>
+</div>
+<div class="hint">SINGLE CLICK TO WATCH</div>
+</div>
+<section class="viewer hidden" id="viewer">
+<div class="viewer-top"><div class="viewer-title" id="viewerTitle">EPISODE</div><button class="close" id="close">CLOSE</button></div>
+<div class="video" id="video"></div>
+<div class="viewer-foot"><span>BAZINGAOS MEDIA PLAYER</span><span>PLACEHOLDER FILE</span></div>
+</section>
+</div>
+</section>
+</main>
+<script src="script.js"></script>
+<script src="cursor.js"></script>
+<script>
+const viewer=document.getElementById("viewer");
+const title=document.getElementById("viewerTitle");
+const video=document.getElementById("video");
+document.querySelectorAll(".episode-app").forEach(app=>app.addEventListener("click",()=>{
+ const n=app.dataset.episode,t=app.dataset.title;
+ title.textContent=t.toUpperCase();
+ video.innerHTML=`<div class="placeholder"><span class="big-num">${String(n).padStart(2,"0")}</span><span class="ep-title">${t.toUpperCase()}</span><span class="coming">VIDEO PLACEHOLDER · COMING SOON</span></div>`;
+ viewer.classList.remove("hidden");
+}));
+document.getElementById("close").addEventListener("click",()=>{viewer.classList.add("hidden");video.innerHTML=""});
+</script>
+
+<div id="episodeRuntime" class="episode-runtime" aria-hidden="true">
+  <div class="runtime-panel">
+    <div class="runtime-header"><span>BAZINGAOS // EPISODE ARCHIVE</span><button id="runtimeBack" class="runtime-back">BACK TO EPISODES</button></div>
+    <div class="runtime-stage">
+      <div id="fileLoader" class="file-loader">
+        <div class="loader-title">FILE FOUND</div>
+        <div class="loader-file">WAITING_ROOM.VID</div>
+        <div id="loaderStatus" class="loader-status">Preparing file...</div>
+        <div class="loader-track"><div id="loaderFill" class="loader-fill"></div></div>
+        <div id="loaderPercent" class="loader-percent">0%</div>
+      </div>
+      <div id="crtFlash" class="crt-flash"></div>
+      <div id="youtubeShell" class="youtube-shell">
+        <iframe id="waitingRoomFrame" title="Wind Python - Waiting Room" src="" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      </div>
+    </div>
+    <div class="runtime-footer"><span>EPISODE 01</span><span>REMOTE VIDEO STREAM</span></div>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{const r=document.getElementById("episodeRuntime"),b=document.getElementById("runtimeBack"),l=document.getElementById("fileLoader"),f=document.getElementById("loaderFill"),p=document.getElementById("loaderPercent"),s=document.getElementById("loaderStatus"),c=document.getElementById("crtFlash"),y=document.getElementById("youtubeShell"),i=document.getElementById("waitingRoomFrame");const q=[...document.querySelectorAll(".episode,.episode-icon,.floppy-app,[data-episode],button")].filter(e=>/waiting room|episode/i.test(e.textContent||""));const w=q.find(e=>/waiting room/i.test(e.textContent||""))||q[0];q.filter(e=>e!==w).forEach(e=>{e.classList.add("locked-episode");e.addEventListener("click",n=>{n.preventDefault();n.stopPropagation()},true)});let t=null,x=0;const a=[[12,"Locating episode file..."],[29,"Reading floppy index..."],[47,"Verifying WAITING_ROOM.VID..."],[68,"Connecting to remote archive..."],[86,"Buffering strange little film..."],[100,"Opening episode..."]];function z(){clearInterval(t);x=0;l.style.display="grid";y.classList.remove("active");c.classList.remove("go");f.style.width="0%";p.textContent="0%";s.textContent="Preparing file...";i.src=""}function h(){z();r.classList.remove("active");r.setAttribute("aria-hidden","true")}function o(){z();r.classList.add("active");r.setAttribute("aria-hidden","false");t=setInterval(()=>{const d=a[x];f.style.width=d[0]+"%";p.textContent=d[0]+"%";s.textContent=d[1];x++;if(x>=a.length){clearInterval(t);setTimeout(()=>{c.classList.add("go");setTimeout(()=>{l.style.display="none";y.classList.add("active");i.src="https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1"},420)},340)}},360)}if(w)w.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();o()},true);b.addEventListener("click",h);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&r.classList.contains("active"))h()})});
+</script>
+
+</body>
+</html>

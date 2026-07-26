@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wind Python</title>
+  <meta name="description" content="The Wind Python universe inside a phone.">
+  <link rel="stylesheet" href="styles.css">
+
+<style id="global-tabletop-continuity">
+html,body{min-height:100%;}
+body{
+
+  background-color:#c89b6e;
+  background-image:
+    radial-gradient(ellipse at 18% 11%, rgba(255,255,255,.16), transparent 26%),
+    radial-gradient(ellipse at 78% 92%, rgba(80,39,17,.10), transparent 31%),
+    repeating-linear-gradient(2deg,
+      rgba(92,47,20,.030) 0px,
+      rgba(92,47,20,.030) 1px,
+      transparent 2px,
+      transparent 13px),
+    repeating-linear-gradient(178deg,
+      transparent 0px,
+      transparent 33px,
+      rgba(255,255,255,.026) 34px,
+      transparent 36px,
+      transparent 77px),
+    linear-gradient(104deg,#d9b184 0%,#cfa375 36%,#d5aa7b 62%,#c39467 100%);
+  background-size:auto,auto,100% 27px,100% 91px,auto;
+  background-position:center;
+  background-repeat:no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-attachment:fixed;
+
+}
+</style>
+
+</head>
+<body>
+  <main class="stage">
+    <div class="desk-items" aria-hidden="true">
+      <div class="desk-note">
+        <span>BAZINGA</span>
+        <small>don't delete<br>Rodney files</small>
+      </div>
+
+      <div class="desk-pencil">
+        <span class="pencil-tip"></span>
+        <span class="pencil-body"></span>
+        <span class="pencil-band"></span>
+        <span class="pencil-eraser"></span>
+      </div>
+<div class="desk-pcb">
+        <span class="pcb-chip chip-a"></span>
+        <span class="pcb-chip chip-b"></span>
+        <span class="pcb-line line-a"></span>
+        <span class="pcb-line line-b"></span>
+        <span class="pcb-node node-a"></span>
+        <span class="pcb-node node-b"></span>
+        <span class="pcb-node node-c"></span>
+      </div>
+
+
+</div>
+
+    <section class="phone" aria-label="Wind Python phone">
+      <div class="phone-screen">
+
+        <!-- LOCK SCREEN -->
+        <section class="lock-screen" id="lockScreen" aria-label="Phone lock screen">
+          <div class="status-bar light">
+            <span class="carrier">WP</span>
+            <span>⌁</span>
+            <span>69% ▰</span>
+          </div>
+
+          <div class="lock-date" id="lockDate">Friday, September 27</div>
+
+          <div class="unlock-wrap">
+            <div class="unlock-track" id="unlockTrack">
+              <div class="unlock-fill" id="unlockFill"></div>
+              <button class="unlock-handle" id="unlockHandle" aria-label="Slide to unlock">›</button>
+              <span class="unlock-label">slide to unlock</span>
+            </div>
+          </div>
+
+          <div class="lock-homebar"></div>
+        </section>
+
+        <!-- HOME SCREEN -->
+        <section class="home-screen hidden" id="homeScreen" aria-label="Wind Python home screen">
+          <div class="status-bar dark">
+            <span class="carrier">WP</span>
+            <span id="homeTime">9:41</span>
+            <span>69% ▰</span>
+          </div>
+
+          <div class="home-clock">
+            <strong id="homeClock">9:41</strong>
+            <span id="homeDate">Friday, September 27</span>
+          </div>
+
+          <section class="app-grid" aria-label="Wind Python apps">
+            <a class="app-link" href="episodes.html">
+              <div class="app-icon episodes-icon">
+                <img src="assets/images/bazinga.png" alt="">
+                <img src="assets/images/wind-python.png" alt="">
+              </div>
+              <span class="app-name">EPISODES</span>
+            </a>
+
+            <a class="app-link" href="meat-ups.html">
+              <div class="app-icon image-icon meatups-icon">
+                <img src="assets/images/meat-ups.png" alt="">
+              </div>
+              <span class="app-name">MEAT UPS</span>
+            </a>
+
+            <a class="app-link" href="shop.html">
+              <div class="app-icon shop-icon">
+                <span class="bag-handle"></span>
+                <span class="bag-body">WP</span>
+              </div>
+              <span class="app-name">SHOP</span>
+            </a>
+
+            <a class="app-link" href="game.html">
+              <div class="app-icon game-icon flappy-game-icon">
+                <span class="controller">WP<br><b>↟</b></span>
+              </div>
+              <span class="app-name">WP FLIGHT</span>
+            </a>
+
+            <a class="app-link" href="nathaniel-chase.html">
+              <div class="app-icon image-icon chase-game-icon nathaniel-head-app-icon">
+                <img src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+              </div>
+              <span class="app-name">NATHANIEL<br>CHASE</span>
+            </a>
+
+            <a class="app-link" href="fan-mail.html">
+              <div class="app-icon mail-icon">
+                <span class="envelope"></span>
+                <span class="heart">♥</span>
+              </div>
+              <span class="app-name">FAN MAIL</span>
+            </a>
+
+            <a class="app-link" href="world.html">
+              <div class="app-icon world-icon">
+                <span class="globe">🌎</span>
+              </div>
+              <span class="app-name">WORLD</span>
+            </a>
+
+            <a class="app-link" href="extras.html">
+              <div class="app-icon extras-icon">
+                <span class="tiny-tv">WP</span>
+              </div>
+              <span class="app-name">EXTRAS</span>
+            </a>
+
+            <a class="app-link" href="about.html">
+              <div class="app-icon about-icon">
+                <span>★</span>
+              </div>
+              <span class="app-name">ABOUT WIND<br>PYTHON</span>
+            </a>
+
+          </section>
+
+          <nav class="dock" aria-label="Quick links">
+            <a href="contact.html" aria-label="Contact">☎</a>
+            <a href="fan-mail.html" aria-label="Messages">•••</a>
+            <a href="world.html" aria-label="World">⌖</a>
+            <a href="extras.html" aria-label="Music and extras">♫</a>
+          </nav>
+
+          <div class="home-indicator"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="cursor.js"></script>
+</body>
+</html>
