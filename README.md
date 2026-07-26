@@ -426,9 +426,3 @@ The WP and battery text were still low because a later CSS rule changed the stat
 - Added pixel T-shirt, mug and tote bag icons.
 - Clicking an icon still opens the real supplied merchandise photograph.
 - Preserved all product descriptions, T-shirt sizes, tabletop background and custom cursor.
-
-
-## V61
-- Rebuilt from the complete V58 archive.
-- Preserved all assets, images, audio and sprites.
-- Added lightweight YouTube Waiting Room playback.

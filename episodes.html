@@ -144,8 +144,8 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 .episode-runtime{position:absolute;inset:0;z-index:80;display:none;padding:22px;background:linear-gradient(145deg,#1b1721,#08070b 75%);overflow:hidden}
 .episode-runtime.active{display:grid}
 .runtime-panel{width:100%;height:100%;min-height:0;display:grid;grid-template-rows:auto 1fr auto;gap:12px;border:2px solid rgba(130,231,255,.25);border-radius:18px;padding:16px;background:#0b0e12;box-shadow:inset 0 0 40px rgba(0,0,0,.8);overflow:hidden}
-.runtime-header,.runtime-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;color:#91e7ff;font:900 10px "Courier New",monospace;letter-spacing:1px}
-.runtime-back{border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 10px;background:#17131b;color:#fff;font:900 9px "Courier New",monospace;cursor:none}
+.runtime-header,.runtime-footer{position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:14px;color:#91e7ff;font:900 10px "Courier New",monospace;letter-spacing:1px}
+.runtime-back{position:relative;z-index:50;min-width:190px;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:12px 16px;background:#17131b;color:#fff;font:900 9px "Courier New",monospace;cursor:none}
 .runtime-stage{position:relative;min-height:0;display:grid;place-items:center;overflow:hidden;border:2px solid rgba(255,255,255,.13);border-radius:13px;background:#020304}
 .file-loader{width:min(520px,88%);display:grid;gap:16px;color:#d7f8ff;font:900 12px "Courier New",monospace}
 .loader-title{color:#f5d76e;font-size:clamp(18px,3vw,28px);letter-spacing:2px}
@@ -156,7 +156,7 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 .crt-flash{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;background:#fff}
 .crt-flash.go{animation:crtFlash .55s steps(3,end)}
 @keyframes crtFlash{0%{opacity:0;transform:scaleY(1)}15%{opacity:.95;transform:scaleY(.03)}35%{opacity:.18;transform:scaleY(1)}58%{opacity:.65;transform:scaleY(.08)}100%{opacity:0;transform:scaleY(1)}}
-.youtube-shell{position:absolute;inset:0;display:none;background:#000}.youtube-shell.active{display:block}
+.youtube-shell{position:absolute;inset:0;z-index:10;display:none;background:#000}.youtube-shell.active{display:block}
 .youtube-shell iframe{width:100%;height:100%;border:0;display:block}
 .locked-episode{position:relative;opacity:.62}.locked-episode::after{content:"LOCKED";position:absolute;right:3px;top:3px;padding:3px 5px;border:1px solid rgba(255,255,255,.25);border-radius:5px;background:rgba(8,7,11,.82);color:#ff9ec8;font:900 7px "Courier New",monospace}
 
@@ -202,7 +202,7 @@ document.getElementById("close").addEventListener("click",()=>{viewer.classList.
 
 <div id="episodeRuntime" class="episode-runtime" aria-hidden="true">
   <div class="runtime-panel">
-    <div class="runtime-header"><span>BAZINGAOS // EPISODE ARCHIVE</span><button id="runtimeBack" class="runtime-back">BACK TO EPISODES</button></div>
+    <div class="runtime-header"><span>BAZINGAOS // EPISODE ARCHIVE</span><button id="runtimeBack" class="runtime-back">◄ BACK TO EPISODES</button></div>
     <div class="runtime-stage">
       <div id="fileLoader" class="file-loader">
         <div class="loader-title">FILE FOUND</div>
@@ -222,7 +222,17 @@ document.getElementById("close").addEventListener("click",()=>{viewer.classList.
 
 
 <script>
-document.addEventListener("DOMContentLoaded",()=>{const r=document.getElementById("episodeRuntime"),b=document.getElementById("runtimeBack"),l=document.getElementById("fileLoader"),f=document.getElementById("loaderFill"),p=document.getElementById("loaderPercent"),s=document.getElementById("loaderStatus"),c=document.getElementById("crtFlash"),y=document.getElementById("youtubeShell"),i=document.getElementById("waitingRoomFrame");const q=[...document.querySelectorAll(".episode,.episode-icon,.floppy-app,[data-episode],button")].filter(e=>/waiting room|episode/i.test(e.textContent||""));const w=q.find(e=>/waiting room/i.test(e.textContent||""))||q[0];q.filter(e=>e!==w).forEach(e=>{e.classList.add("locked-episode");e.addEventListener("click",n=>{n.preventDefault();n.stopPropagation()},true)});let t=null,x=0;const a=[[12,"Locating episode file..."],[29,"Reading floppy index..."],[47,"Verifying WAITING_ROOM.VID..."],[68,"Connecting to remote archive..."],[86,"Buffering strange little film..."],[100,"Opening episode..."]];function z(){clearInterval(t);x=0;l.style.display="grid";y.classList.remove("active");c.classList.remove("go");f.style.width="0%";p.textContent="0%";s.textContent="Preparing file...";i.src=""}function h(){z();r.classList.remove("active");r.setAttribute("aria-hidden","true")}function o(){z();r.classList.add("active");r.setAttribute("aria-hidden","false");t=setInterval(()=>{const d=a[x];f.style.width=d[0]+"%";p.textContent=d[0]+"%";s.textContent=d[1];x++;if(x>=a.length){clearInterval(t);setTimeout(()=>{c.classList.add("go");setTimeout(()=>{l.style.display="none";y.classList.add("active");i.src="https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1"},420)},340)}},360)}if(w)w.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();o()},true);b.addEventListener("click",h);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&r.classList.contains("active"))h()})});
+document.addEventListener("DOMContentLoaded",()=>{const r=document.getElementById("episodeRuntime"),b=document.getElementById("runtimeBack"),l=document.getElementById("fileLoader"),f=document.getElementById("loaderFill"),p=document.getElementById("loaderPercent"),s=document.getElementById("loaderStatus"),c=document.getElementById("crtFlash"),y=document.getElementById("youtubeShell"),i=document.getElementById("waitingRoomFrame");const q=[...document.querySelectorAll(".episode,.episode-icon,.floppy-app,[data-episode],button")].filter(e=>/waiting room|episode/i.test(e.textContent||""));const w=q.find(e=>/waiting room/i.test(e.textContent||""))||q[0];q.filter(e=>e!==w && !e.closest("#episodeRuntime")).forEach(e=>{e.classList.add("locked-episode");e.addEventListener("click",n=>{n.preventDefault();n.stopPropagation()},true)});let t=null,x=0;const a=[[12,"Locating episode file..."],[29,"Reading floppy index..."],[47,"Verifying WAITING_ROOM.VID..."],[68,"Connecting to remote archive..."],[86,"Buffering strange little film..."],[100,"Opening episode..."]];function z(){clearInterval(t);x=0;l.style.display="grid";y.classList.remove("active");c.classList.remove("go");f.style.width="0%";p.textContent="0%";s.textContent="Preparing file...";i.src=""}function h(){
+      clearInterval(t);
+      i.src="";
+      y.classList.remove("active");
+      c.classList.add("go");
+      setTimeout(()=>{
+        z();
+        r.classList.remove("active");
+        r.setAttribute("aria-hidden","true");
+      },260);
+    }function o(){z();r.classList.add("active");r.setAttribute("aria-hidden","false");t=setInterval(()=>{const d=a[x];f.style.width=d[0]+"%";p.textContent=d[0]+"%";s.textContent=d[1];x++;if(x>=a.length){clearInterval(t);setTimeout(()=>{c.classList.add("go");setTimeout(()=>{l.style.display="none";y.classList.add("active");i.src="https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1"},420)},340)}},360)}if(w)w.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();o()},true);b.addEventListener("click",h);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&r.classList.contains("active"))h()})});
 </script>
 
 </body>

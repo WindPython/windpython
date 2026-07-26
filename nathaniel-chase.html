@@ -35,11 +35,10 @@
   .mobile-controls{position:absolute;inset:auto 0 16px;z-index:12;display:none;justify-content:space-between;
     align-items:end;padding:0 18px;pointer-events:none}
   .dpad{width:138px;height:138px;position:relative;pointer-events:auto}
-  .dpad button,.water-btn{position:absolute;background:rgba(22,12,30,.78);color:#fff;border:2px solid #8c69a2;
+  .dpad button{position:absolute;background:rgba(22,12,30,.78);color:#fff;border:2px solid #8c69a2;
     box-shadow:none;padding:0;touch-action:none;user-select:none}
   .dpad button{width:46px;height:46px;font-size:20px}
   .up{left:46px;top:0}.down{left:46px;bottom:0}.left{left:0;top:46px}.right{right:0;top:46px}
-  .water-btn{position:relative;width:82px;height:82px;border-radius:50%;font:900 13px "Courier New",monospace}
 
   .ready-overlay{background:rgba(4,2,7,.42);pointer-events:none}
   .ready-card{text-align:center;transform:translateY(90px)}
@@ -145,7 +144,7 @@ body{
         <button class="left" data-dir="left">◀</button>
         <button class="right" data-dir="right">▶</button>
       </div>
-      <button class="water-btn" id="waterBtn">WATER<br>POWER</button>
+      
     </div>
 
 
@@ -228,6 +227,31 @@ body{
   const burgerCollectSound = new Audio("assets/audio/butt-burger-collect.mp3");
   burgerCollectSound.preload = "auto";
   burgerCollectSound.volume = 0.95;
+
+
+  const titleLoopSound = new Audio("assets/audio/iwannashow.mp3");
+  titleLoopSound.preload = "auto";
+  titleLoopSound.loop = true;
+  titleLoopSound.volume = 0.7;
+
+  const winSound = new Audio("assets/audio/van.mp3");
+  winSound.preload = "auto";
+  winSound.volume = 0.95;
+
+  function startTitleLoop(){
+    if(titlePanel.classList.contains("hidden")) return;
+    titleLoopSound.play().catch(()=>{});
+  }
+
+  function stopTitleLoop(){
+    titleLoopSound.pause();
+    titleLoopSound.currentTime = 0;
+  }
+
+  // Browsers may block autoplay until the first click or key press.
+  startTitleLoop();
+  document.addEventListener("pointerdown", startTitleLoop, {once:true});
+  document.addEventListener("keydown", startTitleLoop, {once:true});
 
   const gameMusic = new Audio("assets/audio/nathaniel-game-music.mp3");
   gameMusic.preload = "auto";
@@ -613,6 +637,7 @@ body{
     captureAnimations=[];
     caughtSound.pause(); caughtSound.currentTime=0;
     loseSound.pause(); loseSound.currentTime=0;
+    winSound.pause(); winSound.currentTime=0;
     burgerCollectSound.pause(); burgerCollectSound.currentTime=0;
     gameMusic.pause();
     gameMusic.currentTime=0;
@@ -650,7 +675,11 @@ body{
     winHeads.classList.toggle("hidden",!won);
     winChecks.classList.toggle("hidden",!won);
 
-    if(!won){
+    if(won){
+      winSound.pause();
+      winSound.currentTime=0;
+      winSound.play().catch(()=>{});
+    }else{
       loseSound.pause();
       loseSound.currentTime=0;
       loseSound.play().catch(()=>{});
@@ -675,6 +704,7 @@ body{
   });
 
   titleStartButton.addEventListener("click",()=>{
+    stopTitleLoop();
     titlePanel.classList.add("hidden");
     startPanel.classList.add("hidden");
     start();
@@ -682,12 +712,6 @@ body{
 
   document.getElementById("startBtn").addEventListener("click",start);
   document.getElementById("restartBtn").addEventListener("click",start);
-  document.getElementById("waterBtn").addEventListener("click",()=>{
-    if(running && powerTimer<=0){
-      // Button is decorative unless a power-up has been collected.
-      endText.textContent="";
-    }
-  });
 
   resetLevel(true);
   running=false;

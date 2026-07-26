@@ -35,6 +35,36 @@ body{
 }
 </style>
 
+
+  <style id="game-app-icon-fixes">
+    .flappy-game-icon,
+    .nathaniel-head-app-icon {
+      overflow: hidden;
+    }
+
+    .flappy-game-icon img {
+      width: 88%;
+      height: 88%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      filter: drop-shadow(0 3px 1px rgba(0,0,0,.18));
+    }
+
+    .nathaniel-head-app-icon {
+      background: #f1c4d4;
+    }
+
+    .nathaniel-head-app-icon img {
+      width: 91%;
+      height: 91%;
+      object-fit: contain;
+      object-position: center center;
+      display: block;
+      transform: translateY(3%);
+    }
+  </style>
+
 </head>
 <body>
   <main class="stage">
@@ -126,14 +156,14 @@ body{
 
             <a class="app-link" href="game.html">
               <div class="app-icon game-icon flappy-game-icon">
-                <span class="controller">WP<br><b>↟</b></span>
+                <img src="assets/images/wind-python-fly-cropped.png" alt="Wind Python flying">
               </div>
               <span class="app-name">WP FLIGHT</span>
             </a>
 
             <a class="app-link" href="nathaniel-chase.html">
               <div class="app-icon image-icon chase-game-icon nathaniel-head-app-icon">
-                <img src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+                <img src="assets/images/nathaniel-chase/nathaniel.png" alt="">
               </div>
               <span class="app-name">NATHANIEL<br>CHASE</span>
             </a>
