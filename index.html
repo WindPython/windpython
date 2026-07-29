@@ -388,5 +388,62 @@ window.addEventListener("pageshow", () => {
 });
 </script>
 
+
+<script id="flightReturnMessageBridge">
+window.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "bazinga-close-flight") return;
+
+  const possibleOverlays = [
+    document.getElementById("gameAppOverlay"),
+    document.getElementById("flightAppOverlay"),
+    document.getElementById("chaseAppOverlay"),
+    document.querySelector(".app-overlay.open"),
+    document.querySelector(".game-overlay.open"),
+    document.querySelector("[class*='overlay'].open")
+  ].filter(Boolean);
+
+  possibleOverlays.forEach((overlay) => {
+    overlay.classList.remove("open", "active");
+    overlay.setAttribute("aria-hidden", "true");
+
+    const frame = overlay.querySelector("iframe");
+    if (frame) {
+      frame.src = "about:blank";
+    }
+  });
+
+  document.body.classList.remove("chase-open", "game-open", "app-open");
+
+  const parentCursor = document.getElementById("wp-custom-cursor");
+  if (parentCursor) {
+    parentCursor.style.display = "";
+    parentCursor.style.opacity = "1";
+    parentCursor.style.visibility = "visible";
+  }
+});
+</script>
+
+
+<script id="flightReturnDynamicBridge">
+window.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "bazinga-close-flight") return;
+
+  for (const frame of document.querySelectorAll("iframe")) {
+    if (frame.contentWindow === event.source) {
+      const container =
+        frame.closest(".app-overlay, .game-overlay, [id$='Overlay'], [class*='overlay']");
+
+      if (container) {
+        container.classList.remove("open", "active", "visible");
+        container.setAttribute("aria-hidden", "true");
+      }
+
+      frame.src = "about:blank";
+      break;
+    }
+  }
+});
+</script>
+
 </body>
 </html>

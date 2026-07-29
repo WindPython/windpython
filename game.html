@@ -122,6 +122,181 @@ body{
 }
 </style>
 
+
+<style id="flightEpisodeRewardStyles">
+  #rewardPanel{
+    position:absolute;inset:0;z-index:90;display:grid;place-items:center;
+    padding:24px;background:rgba(7,5,12,.82);backdrop-filter:blur(3px);
+  }
+  #rewardPanel.hidden{display:none}
+  .reward-card{
+    width:min(560px,88%);padding:24px 28px;border:3px solid #92e8ff;border-radius:18px;
+    background:linear-gradient(145deg,#17131f,#08070c 78%);
+    box-shadow:0 0 0 5px rgba(0,0,0,.45),0 0 34px rgba(146,232,255,.22);
+    color:white;text-align:center;font-family:"Courier New",monospace;
+  }
+  .reward-kicker{color:#92e8ff;font-weight:900;letter-spacing:2px;font-size:clamp(13px,2vw,20px)}
+  .reward-card h1{margin:9px 0 8px;font-size:clamp(28px,5vw,52px);line-height:.95}
+  .reward-card p{margin:8px 0;font-weight:700;font-size:clamp(13px,1.8vw,19px)}
+  .reward-file{margin:16px auto 10px;color:#ff9ec8;font-weight:900;letter-spacing:2px}
+  .reward-code{
+    margin:10px auto 14px;padding:13px 18px;width:min(390px,100%);
+    border:2px dashed #ffe46b;border-radius:10px;background:#08070b;
+    color:#ffe46b;font-size:clamp(25px,5vw,48px);font-weight:900;
+    letter-spacing:2px;overflow-wrap:anywhere;
+  }
+  .reward-card button{
+    margin-top:10px;padding:11px 18px;border:2px solid #fff;border-radius:9px;
+    background:#ef5f9a;color:#fff;font:900 15px "Courier New",monospace;
+    box-shadow:4px 4px 0 #111;cursor:none;
+  }
+  @media(max-height:520px){
+    .reward-card{padding:14px 20px}
+    .reward-card h1{font-size:28px}
+    .reward-code{font-size:25px;padding:8px 12px;margin:7px auto}
+    .reward-card p{margin:4px 0}
+  }
+</style>
+
+
+<style id="flightRewardV74Polish">
+  #rewardPanel{
+    padding:clamp(8px,2vw,18px) !important;
+    overflow:hidden !important;
+  }
+
+  .reward-card{
+    width:min(560px,92%) !important;
+    max-height:92% !important;
+    padding:clamp(12px,2.1vw,22px) clamp(16px,2.5vw,26px) !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:clamp(5px,1vw,10px) !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  .reward-kicker{
+    font-size:clamp(11px,1.7vw,18px) !important;
+    margin:0 !important;
+  }
+
+  .reward-card h1{
+    margin:0 !important;
+    font-size:clamp(24px,4.5vw,46px) !important;
+    line-height:.92 !important;
+  }
+
+  .reward-card p{
+    margin:0 !important;
+    font-size:clamp(11px,1.6vw,17px) !important;
+    line-height:1.2 !important;
+  }
+
+  .reward-file{
+    margin:4px auto 0 !important;
+    font-size:clamp(11px,1.5vw,16px) !important;
+  }
+
+  .reward-code{
+    margin:3px auto 4px !important;
+    padding:clamp(8px,1.5vw,13px) clamp(12px,2vw,18px) !important;
+    width:min(390px,94%) !important;
+    font-size:clamp(22px,4.5vw,42px) !important;
+    line-height:1 !important;
+  }
+
+  .reward-card button{
+    margin-top:4px !important;
+    padding:clamp(8px,1.2vw,11px) clamp(14px,2vw,18px) !important;
+    font-size:clamp(11px,1.5vw,15px) !important;
+    flex:0 0 auto !important;
+  }
+
+  #rewardProgress{
+    width:min(390px,92%);
+    margin:5px auto 1px;
+    display:grid;
+    gap:5px;
+  }
+
+  .reward-progress-track{
+    width:100%;
+    height:12px;
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:999px;
+    overflow:hidden;
+    background:#050507;
+  }
+
+  .reward-progress-fill{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#92e8ff,#ff9ec8);
+    transition:width .28s steps(4,end);
+  }
+
+  #rewardStatus{
+    min-height:18px;
+    color:#92e8ff;
+    font:900 clamp(9px,1.2vw,13px) "Courier New",monospace;
+    letter-spacing:1px;
+  }
+
+  #rewardSecret{
+    width:100%;
+    display:none;
+  }
+
+  #rewardSecret.revealed{
+    display:block;
+    animation:rewardReveal .28s ease both;
+  }
+
+  @keyframes rewardReveal{
+    from{opacity:0;transform:scale(.96)}
+    to{opacity:1;transform:scale(1)}
+  }
+
+  @media(max-height:520px){
+    .reward-card{
+      width:min(620px,94%) !important;
+      max-height:94% !important;
+      padding:9px 16px !important;
+      gap:3px !important;
+    }
+    .reward-card h1{font-size:26px !important}
+    .reward-code{font-size:25px !important;padding:6px 10px !important}
+    .reward-card p{font-size:11px !important}
+    #rewardProgress{margin:2px auto 0}
+  }
+</style>
+
+
+<style id="rewardButtonPointerFix">
+  #rewardPanel,
+  #rewardPanel .reward-card,
+  #rewardPanel #rewardSecret,
+  #rewardPanel a,
+  #rewardPanel button {
+    pointer-events:auto !important;
+  }
+  #rewardReturn {
+    display:inline-block;
+    margin-top:4px;
+    padding:clamp(8px,1.2vw,11px) clamp(14px,2vw,18px);
+    border:2px solid #fff;
+    border-radius:9px;
+    background:#ef5f9a;
+    color:#fff;
+    font:900 clamp(11px,1.5vw,15px) "Courier New",monospace;
+    box-shadow:4px 4px 0 #111;
+    text-decoration:none;
+    cursor:none;
+  }
+</style>
 </head>
 <body class="landscape-page">
   <div class="landscape-phone">
@@ -137,6 +312,28 @@ body{
           <p>Fly through the gaps without crashing.</p>
           <button id="startButton" type="button">Start flight</button>
         </section>
+        
+<section id="rewardPanel" class="hidden" aria-hidden="true">
+  <div class="reward-card">
+    <div class="reward-kicker">MISSION COMPLETE</div>
+    <h1>NEW FILE RECOVERED</h1>
+    <p>Ten obstacles cleared.</p>
+
+    <div id="rewardProgress">
+      <div class="reward-progress-track">
+        <div id="rewardProgressFill" class="reward-progress-fill"></div>
+      </div>
+      <div id="rewardStatus">RECOVERING SYSTEM FILE...</div>
+    </div>
+
+    <div id="rewardSecret">
+      <div class="reward-file">EPISODE 01 ACCESS KEY</div>
+      <div class="reward-code">GINGER PUBES</div>
+      <p>Enter this password inside the Episodes app.</p>
+      <a id="rewardReturn" href="index.html">RETURN TO PHONE</a>
+    </div>
+  </div>
+</section>
         <section class="game-message hidden" id="gameOverPanel">
           <h1>Flight over</h1>
           <p>Score: <strong id="finalScore">0</strong></p>
@@ -160,6 +357,48 @@ body{
     const bestScoreEl = document.getElementById('bestScore');
     const startButton = document.getElementById('startButton');
     const restartButton = document.getElementById('restartButton');
+    const rewardPanel = document.getElementById('rewardPanel');
+    const rewardProgressFill = document.getElementById('rewardProgressFill');
+    const rewardStatus = document.getElementById('rewardStatus');
+    const rewardSecret = document.getElementById('rewardSecret');
+    let rewardEarnedThisRun = false;
+    let rewardSequenceTimer = null;
+
+    const themeMusic = new Audio('flight-theme.mp3');
+    themeMusic.loop = true;
+    themeMusic.volume = 0.48;
+    themeMusic.preload = 'auto';
+
+    const flapSound = new Audio('flight-flap.mp3');
+    flapSound.volume = 0.78;
+    flapSound.preload = 'auto';
+
+    const deathSound = new Audio('flight-death.mp3');
+    deathSound.volume = 0.88;
+    deathSound.preload = 'auto';
+
+    function startThemeMusic() {
+      if (themeMusic.paused) {
+        themeMusic.currentTime = 0;
+        themeMusic.play().catch(() => {});
+      }
+    }
+
+    function stopThemeMusic() {
+      themeMusic.pause();
+      themeMusic.currentTime = 0;
+    }
+
+    function playFlapSound() {
+      const sound = flapSound.cloneNode();
+      sound.volume = flapSound.volume;
+      sound.play().catch(() => {});
+    }
+
+    function playDeathSound() {
+      deathSound.currentTime = 0;
+      deathSound.play().catch(() => {});
+    }
 
     const flyer = new Image();
     flyer.src = 'assets/images/wind-python-fly-cropped.png';
@@ -217,11 +456,20 @@ body{
       scoreEl.textContent = '0';
       startPanel.classList.add('hidden');
       gameOverPanel.classList.add('hidden');
+      rewardPanel.classList.add('hidden');
+      rewardPanel.setAttribute('aria-hidden','true');
+      rewardProgressFill.style.width = '0%';
+      rewardStatus.textContent = 'RECOVERING SYSTEM FILE...';
+      rewardSecret.classList.remove('revealed');
+      clearTimeout(rewardSequenceTimer);
+      rewardEarnedThisRun = false;
+      startThemeMusic();
     }
 
     function flap() {
       if (!running) return;
       player.vy = player.flap;
+      playFlapSound();
     }
 
     function addPipe() {
@@ -249,10 +497,55 @@ body{
              bottom > ry;
     }
 
+
+    function completeFlightMission() {
+      if (rewardEarnedThisRun) return;
+      rewardEarnedThisRun = true;
+      running = false;
+      gameOver = true;
+      stopThemeMusic();
+      best = Math.max(best, score);
+
+      try { localStorage.setItem('wpFlightCodeDiscovered', 'true'); } catch (e) {}
+
+      rewardProgressFill.style.width = '0%';
+      rewardStatus.textContent = 'RECOVERING SYSTEM FILE...';
+      rewardSecret.classList.remove('revealed');
+      rewardPanel.classList.remove('hidden');
+      rewardPanel.setAttribute('aria-hidden','false');
+
+      const stages = [
+        [18, 'RECOVERING SYSTEM FILE...'],
+        [43, 'VERIFYING ARCHIVE...'],
+        [72, 'DECRYPTING ACCESS KEY...'],
+        [100, 'ACCESS KEY FOUND']
+      ];
+
+      let index = 0;
+      const advance = () => {
+        const [percent, text] = stages[index];
+        rewardProgressFill.style.width = percent + '%';
+        rewardStatus.textContent = text;
+        index += 1;
+
+        if (index < stages.length) {
+          rewardSequenceTimer = setTimeout(advance, 420);
+        } else {
+          rewardSequenceTimer = setTimeout(() => {
+            rewardSecret.classList.add('revealed');
+          }, 320);
+        }
+      };
+
+      rewardSequenceTimer = setTimeout(advance, 160);
+    }
+
     function endGame() {
       if (gameOver) return;
       running = false;
       gameOver = true;
+      stopThemeMusic();
+      playDeathSound();
       best = Math.max(best, score);
       finalScoreEl.textContent = score;
       bestScoreEl.textContent = best;
@@ -348,6 +641,10 @@ body{
           pipe.passed = true;
           score++;
           scoreEl.textContent = score;
+          if (score >= 10) {
+            completeFlightMission();
+            return;
+          }
         }
 
         const hitTop = intersects(player.x, player.y, player.w, player.h, pipe.x, 0, pipe.w, pipe.top);
@@ -389,7 +686,7 @@ body{
 
     function action(event) {
       const target = event.target;
-      if (target.closest && target.closest('a, button')) return;
+      if (target.closest && target.closest('a, button, #rewardPanel')) return;
       flap();
     }
 
@@ -415,6 +712,21 @@ body{
     restartButton.addEventListener('click', () => {
       resetGame();
       flap();
+    });
+
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        themeMusic.pause();
+      } else if (running) {
+        themeMusic.play().catch(() => {});
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      themeMusic.pause();
+      flapSound.pause();
+      deathSound.pause();
     });
 
     draw();
