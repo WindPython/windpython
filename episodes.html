@@ -328,17 +328,11 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 <script src="script.js"></script>
 <script src="cursor.js"></script>
 <script>
-  // SESSION-ONLY EPISODE UNLOCK: closing the site/app locks Episode 1 again.
-const viewer=document.getElementById("viewer");
-const title=document.getElementById("viewerTitle");
-const video=document.getElementById("video");
-document.querySelectorAll(".episode-app").forEach(app=>app.addEventListener("click",()=>{
- const n=app.dataset.episode,t=app.dataset.title;
- title.textContent=t.toUpperCase();
- video.innerHTML=`<div class="placeholder"><span class="big-num">${String(n).padStart(2,"0")}</span><span class="ep-title">${t.toUpperCase()}</span><span class="coming">VIDEO PLACEHOLDER · COMING SOON</span></div>`;
- viewer.classList.remove("hidden");
-}));
-document.getElementById("close").addEventListener("click",()=>{viewer.classList.add("hidden");video.innerHTML=""});
+/* Episode floppy clicks are handled by the password controller below. */
+document.getElementById("close").addEventListener("click",()=>{
+  document.getElementById("viewer").classList.add("hidden");
+  document.getElementById("video").innerHTML="";
+});
 </script>
 
 <div id="episodeRuntime" class="episode-runtime" aria-hidden="true">
@@ -371,58 +365,67 @@ document.getElementById("close").addEventListener("click",()=>{viewer.classList.
 </div>
 
 
-<script id="episodeOneUnlockController">
+<script id="episodePasswordController">
 document.addEventListener("DOMContentLoaded",()=>{
-  const STORAGE_KEY="windPythonEpisode01Unlocked";
-  const REQUIRED_CODE="GINGER PUBES";
-  const ep1=document.querySelector('[data-episode="1"]');
+  const EPISODES={
+    "1":{code:"GINGER PUBES",title:"WAITING ROOM",playable:true},
+    "2":{code:"FARTMOUTH",title:"EPISODE TWO",playable:false},
+    "3":{code:null,title:"EPISODE THREE",playable:false},
+    "4":{code:null,title:"EPISODE FOUR",playable:false},
+    "5":{code:null,title:"EPISODE FIVE",playable:false}
+  };
+
   const gate=document.getElementById("episodePasswordGate");
   const form=document.getElementById("episodePasswordForm");
   const input=document.getElementById("episodePasswordInput");
   const cancel=document.getElementById("passwordCancel");
   const message=document.getElementById("passwordMessage");
+  const gateTitle=gate.querySelector("h2");
+  const gateKicker=gate.querySelector(".terminal-kicker");
+  const status=gate.querySelector(".status");
 
-  const r=document.getElementById("episodeRuntime");
-  const b=document.getElementById("runtimeBack");
-  const l=document.getElementById("fileLoader");
-  const f=document.getElementById("loaderFill");
-  const p=document.getElementById("loaderPercent");
-  const s=document.getElementById("loaderStatus");
-  const c=document.getElementById("crtFlash");
-  const y=document.getElementById("youtubeShell");
-  const i=document.getElementById("waitingRoomFrame");
+  const runtime=document.getElementById("episodeRuntime");
+  const runtimeBack=document.getElementById("runtimeBack");
+  const loader=document.getElementById("fileLoader");
+  const loaderFill=document.getElementById("loaderFill");
+  const loaderPercent=document.getElementById("loaderPercent");
+  const loaderStatus=document.getElementById("loaderStatus");
+  const crtFlash=document.getElementById("crtFlash");
+  const youtubeShell=document.getElementById("youtubeShell");
+  const frame=document.getElementById("waitingRoomFrame");
   const localNote=document.getElementById("runtimeLocalNote");
 
-  let timer=null,step=0;
+  const viewer=document.getElementById("viewer");
+  const viewerTitle=document.getElementById("viewerTitle");
+  const video=document.getElementById("video");
+
+  let selectedEpisode="1";
+  let timer=null;
+  let step=0;
+
   const stages=[
     [12,"Locating episode file..."],
     [29,"Reading floppy index..."],
-    [47,"Verifying WAITING_ROOM.VID..."],
-    [68,"Connecting to remote archive..."],
-    [86,"Buffering strange little film..."],
+    [47,"Verifying access key..."],
+    [68,"Mounting floppy..."],
+    [86,"Loading archive..."],
     [100,"Opening episode..."]
   ];
-
-  function isUnlocked(){
-    try{return sessionStorage.getItem(STORAGE_KEY)==="true"}catch(e){return false}
-  }
-
-  function paintState(){
-    if(!ep1)return;
-    ep1.classList.toggle("is-unlocked",isUnlocked());
-    ep1.classList.toggle("is-locked",!isUnlocked());
-    const label=ep1.querySelector(".label");
-    if(label)label.textContent=isUnlocked()?"Episode One · Play":"Episode One";
-  }
 
   function normalize(value){
     return value.trim().replace(/\s+/g," ").toUpperCase();
   }
 
-  function openGate(){
+  function openGate(n){
+    selectedEpisode=n;
+    const ep=EPISODES[n];
     message.textContent="";
     message.className="";
     input.value="";
+    if(gateKicker)gateKicker.textContent="BAZINGAOS // PASSWORD REQUIRED";
+    if(gateTitle)gateTitle.textContent="EPISODE "+String(n).padStart(2,"0");
+    if(status)status.textContent="ENTER ACCESS KEY";
+    input.setAttribute("aria-label","Episode "+n+" access key");
     gate.classList.remove("hidden");
     gate.setAttribute("aria-hidden","false");
     setTimeout(()=>input.focus(),50);
@@ -437,50 +440,50 @@ document.addEventListener("DOMContentLoaded",()=>{
   function resetRuntime(){
     clearInterval(timer);
     step=0;
-    l.style.display="grid";
-    y.classList.remove("active");
+    loader.style.display="grid";
+    youtubeShell.classList.remove("active");
     localNote.classList.remove("active");
-    c.classList.remove("go");
-    f.style.width="0%";
-    p.textContent="0%";
-    s.textContent="Preparing file...";
-    i.src="";
+    crtFlash.classList.remove("go");
+    loaderFill.style.width="0%";
+    loaderPercent.textContent="0%";
+    loaderStatus.textContent="Preparing file...";
+    frame.src="";
   }
 
   function closeRuntime(){
     clearInterval(timer);
-    i.src="";
-    y.classList.remove("active");
+    frame.src="";
+    youtubeShell.classList.remove("active");
     localNote.classList.remove("active");
-    c.classList.add("go");
+    crtFlash.classList.add("go");
     setTimeout(()=>{
       resetRuntime();
-      r.classList.remove("active");
-      r.setAttribute("aria-hidden","true");
+      runtime.classList.remove("active");
+      runtime.setAttribute("aria-hidden","true");
     },260);
   }
 
-  function openRuntime(){
+  function openEpisodeOne(){
     resetRuntime();
-    r.classList.add("active");
-    r.setAttribute("aria-hidden","false");
+    runtime.classList.add("active");
+    runtime.setAttribute("aria-hidden","false");
     timer=setInterval(()=>{
       const stage=stages[step];
-      f.style.width=stage[0]+"%";
-      p.textContent=stage[0]+"%";
-      s.textContent=stage[1];
+      loaderFill.style.width=stage[0]+"%";
+      loaderPercent.textContent=stage[0]+"%";
+      loaderStatus.textContent=stage[1];
       step++;
       if(step>=stages.length){
         clearInterval(timer);
         setTimeout(()=>{
-          c.classList.add("go");
+          crtFlash.classList.add("go");
           setTimeout(()=>{
-            l.style.display="none";
+            loader.style.display="none";
             if(window.location.protocol==="file:"){
               localNote.classList.add("active");
             }else{
-              y.classList.add("active");
-              i.src="https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+              youtubeShell.classList.add("active");
+              frame.src="https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1";
             }
           },420);
         },340);
@@ -488,26 +491,44 @@ document.addEventListener("DOMContentLoaded",()=>{
     },360);
   }
 
-  if(ep1){
-    ep1.addEventListener("click",event=>{
+  function openPlaceholder(n){
+    const ep=EPISODES[n];
+    viewerTitle.textContent=ep.title;
+    video.innerHTML=`<div class="placeholder">
+      <span class="big-num">${String(n).padStart(2,"0")}</span>
+      <span class="ep-title">${ep.title}</span>
+      <span class="coming">ACCESS ACCEPTED · VIDEO COMING SOON</span>
+    </div>`;
+    viewer.classList.remove("hidden");
+  }
+
+  document.querySelectorAll(".episode-app").forEach(app=>{
+    app.classList.add("locked-episode");
+    app.addEventListener("click",event=>{
       event.preventDefault();
       event.stopImmediatePropagation();
-      if(isUnlocked())openRuntime();
-      else openGate();
+      openGate(app.dataset.episode);
     },true);
-  }
+  });
 
   form.addEventListener("submit",event=>{
     event.preventDefault();
-    if(normalize(input.value)===REQUIRED_CODE){
-      try{sessionStorage.setItem(STORAGE_KEY,"true")}catch(e){}
-      message.textContent="ACCESS GRANTED · EPISODE 01 UNLOCKED";
+    const ep=EPISODES[selectedEpisode];
+    if(!ep.code){
+      message.textContent="ACCESS DENIED · NO VALID KEY HAS BEEN ISSUED YET";
+      message.className="";
+      input.select();
+      return;
+    }
+
+    if(normalize(input.value)===ep.code){
+      message.textContent="ACCESS GRANTED · MOUNTING EPISODE "+String(selectedEpisode).padStart(2,"0");
       message.className="success";
-      paintState();
       setTimeout(()=>{
         closeGate();
-        openRuntime();
-      },850);
+        if(selectedEpisode==="1")openEpisodeOne();
+        else openPlaceholder(selectedEpisode);
+      },700);
     }else{
       message.textContent="ACCESS DENIED · THAT KEY DOESN'T BELONG TO THIS FILE";
       message.className="";
@@ -516,25 +537,14 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 
   cancel.addEventListener("click",closeGate);
-  b.addEventListener("click",closeRuntime);
+  runtimeBack.addEventListener("click",closeRuntime);
 
   document.addEventListener("keydown",event=>{
     if(event.key==="Escape"){
       if(!gate.classList.contains("hidden"))closeGate();
-      else if(r.classList.contains("active"))closeRuntime();
+      else if(runtime.classList.contains("active"))closeRuntime();
     }
   });
-
-  // Episodes 02-05 remain visibly locked for future game rewards.
-  document.querySelectorAll('[data-episode="2"],[data-episode="3"],[data-episode="4"],[data-episode="5"]').forEach(app=>{
-    app.classList.add("locked-episode");
-    app.addEventListener("click",event=>{
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    },true);
-  });
-
-  paintState();
 });
 </script>
 

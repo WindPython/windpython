@@ -1,38 +1,4 @@
 const unlockSound=new Audio("assets/audio/unlockphone.mp3");
-
-// Prime the unlock audio during the user's first interaction.
-// This helps mobile browsers allow the sound to play when the phone unlocks.
-let unlockAudioPrimed = false;
-
-function primeUnlockAudio() {
-  if (unlockAudioPrimed) return;
-  unlockAudioPrimed = true;
-
-  const previousVolume = unlockSound.volume;
-  unlockSound.volume = 0;
-
-  const playAttempt = unlockSound.play();
-
-  if (playAttempt && typeof playAttempt.then === "function") {
-    playAttempt
-      .then(() => {
-        unlockSound.pause();
-        unlockSound.currentTime = 0;
-        unlockSound.volume = previousVolume;
-      })
-      .catch(() => {
-        unlockSound.volume = previousVolume;
-        unlockAudioPrimed = false;
-      });
-  } else {
-    unlockSound.pause();
-    unlockSound.currentTime = 0;
-    unlockSound.volume = previousVolume;
-  }
-}
-
-document.addEventListener("pointerdown", primeUnlockAudio, { once: true });
-document.addEventListener("touchstart", primeUnlockAudio, { once: true, passive: true });
 const lockScreen = document.getElementById("lockScreen");
 const homeScreen = document.getElementById("homeScreen");
 const unlockTrack = document.getElementById("unlockTrack");
