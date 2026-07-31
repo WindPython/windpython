@@ -91,9 +91,52 @@
   }
   .capture-pop{animation:capturePop .32s ease-in-out}
   @keyframes capturePop{0%{transform:rotate(0deg) scale(1)}60%{transform:rotate(300deg) scale(.55)}100%{transform:rotate(360deg) scale(.05)}}
-  .win-heads{display:flex;justify-content:center;gap:7px;margin:14px 0 8px}
-  .win-head{width:46px;height:46px;object-fit:contain;background:#b8eb57;border-radius:12px;border:2px solid #111}
-  .win-checks{font:900 17px "Courier New",monospace;color:#7cff75;letter-spacing:14px;margin-left:14px}
+  .win-heads{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:clamp(4px,1.4vw,10px);
+    width:100%;
+    margin:12px auto 8px;
+  }
+  .win-head{
+    display:block;
+    width:clamp(38px,11vw,62px);
+    height:clamp(62px,18vw,98px);
+    object-fit:contain;
+    object-position:center bottom;
+    background:transparent;
+    border:0;
+    border-radius:0;
+    flex:0 1 auto;
+  }
+  .win-checks{display:none !important}
+  .access-reward{
+    margin:14px auto 16px;
+    padding:12px 14px;
+    border:2px solid #65e6ff;
+    background:#090611;
+    box-shadow:4px 4px 0 #000;
+    font-family:"Courier New",monospace;
+  }
+  .access-reward .reward-label{
+    color:#65e6ff;
+    font-size:clamp(10px,2.7vw,13px);
+    font-weight:900;
+    letter-spacing:1px;
+  }
+  .access-reward .reward-code{
+    margin:7px 0 4px;
+    color:#ffe351;
+    font-size:clamp(25px,7vw,42px);
+    font-weight:900;
+    white-space:nowrap;
+  }
+  .access-reward .reward-note{
+    color:#fff;
+    font-size:clamp(10px,2.7vw,13px);
+    font-weight:700;
+  }
 
   @media(max-width:760px),(pointer:coarse){.mobile-controls{display:flex}}
 
@@ -1317,13 +1360,18 @@ body{
         <h2 id="endSub">NATHANIEL CAUGHT WIND PYTHON</h2>
         <p id="endText">Score: 0</p>
       <div class="win-heads hidden" id="winHeads">
-        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
-        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
-        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
-        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
-        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-head-icon.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-full.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-full.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-full.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-full.png" alt="">
+        <img class="win-head" src="assets/images/nathaniel-chase/nathaniel-full.png" alt="">
       </div>
       <div class="win-checks hidden" id="winChecks">✓✓✓✓✓</div>
+      <div class="access-reward hidden" id="accessReward">
+        <div class="reward-label">EPISODE 02 ACCESS KEY</div>
+        <div class="reward-code">FARTMOUTH</div>
+        <div class="reward-note">Remember it. Passwords are not case-sensitive.</div>
+      </div>
         <button id="restartBtn">PLAY AGAIN</button>
       </div>
     </section>
@@ -1416,6 +1464,7 @@ body{
   const endText = document.getElementById("endText");
   const winHeads = document.getElementById("winHeads");
   const winChecks = document.getElementById("winChecks");
+  const accessReward = document.getElementById("accessReward");
 
   const TILE = 32;
   const COLS = 14;
@@ -1463,6 +1512,40 @@ body{
   function key(x,y){ return x+","+y; }
   function walkable(x,y){
     return y>=0 && y<ROWS && x>=0 && x<COLS && map[y][x] !== "#";
+  }
+
+  function tileDistance(a,b){
+    return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+  }
+
+  function respawnEnemyAwayFromPlayer(enemy,minDistance=6){
+    const occupied = new Set(
+      enemies
+        .filter(other=>other!==enemy)
+        .map(other=>key(other.x,other.y))
+    );
+
+    const candidates=[];
+    for(let y=0;y<ROWS;y++){
+      for(let x=0;x<COLS;x++){
+        if(!walkable(x,y)) continue;
+        if(occupied.has(key(x,y))) continue;
+        if(tileDistance({x,y},player)<minDistance) continue;
+        candidates.push({x,y});
+      }
+    }
+
+    const spot=candidates.length
+      ? candidates[Math.floor(Math.random()*candidates.length)]
+      : enemy.home;
+
+    enemy.x=spot.x;
+    enemy.y=spot.y;
+    enemy.prevX=spot.x;
+    enemy.prevY=spot.y;
+    enemy.dir=["left","right","up","down"][Math.floor(Math.random()*4)];
+    enemy.facing=enemy.dir==="left"?-1:1;
+    enemy.delay=8;
   }
 
   function resetLevel(full=true){
@@ -1565,7 +1648,7 @@ body{
           caughtSound.currentTime=0;
           caughtSound.play().catch(()=>{});
 
-          e.x=e.home.x;e.y=e.home.y;e.prevX=e.home.x;e.prevY=e.home.y;e.delay=6;
+          respawnEnemyAwayFromPlayer(e,6);
           updateHud();
 
           if(caughtNathaniels>=5){
@@ -1587,7 +1670,7 @@ body{
     if(pellets.delete(k)){score+=10;}
     if(powerups.delete(k)){
       score+=50;
-      powerTimer=11;
+      powerTimer=15;
       burgerCollectSound.pause();
       burgerCollectSound.currentTime=0;
       burgerCollectSound.play().catch(()=>{});
@@ -1615,7 +1698,7 @@ body{
     if(powerTimer>0) powerTimer=Math.max(0,powerTimer-dt);
 
     const playerStepTime = .23;
-    const enemyStepTime = .34;
+    const enemyStepTime = powerTimer>0 ? .48 : .39;
 
     moveAccumulator += dt;
     enemyAccumulator += dt;
@@ -1833,14 +1916,15 @@ body{
     gameMusic.pause();
     gameMusic.currentTime=0;
 
-    endTitle.textContent=won?"NATHANIELS CAPTURED":"GAME OVER";
+    endTitle.textContent=won?"CAPTURED":"GAME OVER";
     endSub.textContent=won?"5 / 5":"NATHANIEL CAUGHT WIND PYTHON";
     endText.textContent=won
-      ? "WIND PYTHON ESCAPES... FOR NOW. Score: "+score
+      ? "Score: "+score
       : "Score: "+score+" · Nathaniels: "+caughtNathaniels+"/5";
 
     winHeads.classList.toggle("hidden",!won);
     winChecks.classList.toggle("hidden",!won);
+    accessReward.classList.toggle("hidden",!won);
 
     if(won){
       winSound.pause();
@@ -1874,8 +1958,36 @@ body{
 
   document.querySelectorAll("[data-dir]").forEach(btn=>{
     const dir=btn.dataset.dir;
-    btn.addEventListener("pointerdown",e=>{e.preventDefault();setDirection(dir);});
+    const chooseDirection=e=>{
+      e.preventDefault();
+      setDirection(dir);
+    };
+    btn.addEventListener("pointerdown",chooseDirection);
+    btn.addEventListener("touchstart",chooseDirection,{passive:false});
   });
+
+  // Mobile swipe steering across the game screen.
+  let swipeStart=null;
+  const gameScreen=document.querySelector(".game-screen");
+  gameScreen.addEventListener("touchstart",event=>{
+    const touch=event.changedTouches[0];
+    swipeStart={x:touch.clientX,y:touch.clientY};
+  },{passive:true});
+
+  gameScreen.addEventListener("touchend",event=>{
+    if(!swipeStart) return;
+    const touch=event.changedTouches[0];
+    const dx=touch.clientX-swipeStart.x;
+    const dy=touch.clientY-swipeStart.y;
+    swipeStart=null;
+
+    if(Math.max(Math.abs(dx),Math.abs(dy))<18) return;
+    if(Math.abs(dx)>Math.abs(dy)){
+      setDirection(dx>0?"right":"left");
+    }else{
+      setDirection(dy>0?"down":"up");
+    }
+  },{passive:true});
 
   const phoneBackButton = document.getElementById("phoneBackButton");
   phoneBackButton.addEventListener("click",(event)=>{
@@ -1960,5 +2072,55 @@ document.addEventListener("keydown", function(event){
     z-index: 30;
     pointer-events: auto;
     cursor: pointer;
+  }
+
+  /* Mobile chase comfort patch */
+  @media(max-width:760px),(pointer:coarse){
+    .dpad{
+      width:154px !important;
+      height:154px !important;
+      flex-basis:154px !important;
+    }
+    .dpad button{
+      width:56px !important;
+      height:56px !important;
+      font-size:25px !important;
+      touch-action:none !important;
+      -webkit-user-select:none !important;
+      user-select:none !important;
+    }
+    .dpad .up{left:49px !important;top:0 !important}
+    .dpad .down{left:49px !important;bottom:0 !important}
+    .dpad .left{left:0 !important;top:49px !important}
+    .dpad .right{right:0 !important;top:49px !important}
+  }
+
+  #endPanel .card{
+    width:min(94%,390px) !important;
+    max-height:92% !important;
+    overflow-y:auto !important;
+    padding:clamp(15px,4vw,24px) !important;
+  }
+  #endTitle{
+    font-size:clamp(34px,11vw,58px) !important;
+    line-height:.92 !important;
+    white-space:nowrap !important;
+    word-break:normal !important;
+    overflow-wrap:normal !important;
+  }
+  #endSub{
+    font-size:clamp(27px,8vw,44px) !important;
+    margin:10px 0 6px !important;
+  }
+  #endText{
+    font-size:clamp(14px,3.7vw,18px) !important;
+    margin:7px 0 !important;
+  }
+  @media(max-width:430px){
+    .win-heads{gap:2px !important}
+    .win-head{
+      width:min(16vw,52px) !important;
+      height:min(24vw,80px) !important;
+    }
   }
 </style>
