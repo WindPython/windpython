@@ -161,6 +161,126 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 .locked-episode{position:relative;opacity:.62}.locked-episode::after{content:"LOCKED";position:absolute;right:3px;top:3px;padding:3px 5px;border:1px solid rgba(255,255,255,.25);border-radius:5px;background:rgba(8,7,11,.82);color:#ff9ec8;font:900 7px "Courier New",monospace}
 
 </style>
+
+<style id="episodePasswordUnlockStyles">
+  .episode-app{position:relative;opacity:.72}
+  .episode-app::after{
+    content:"LOCKED";
+    position:absolute;right:3px;top:3px;padding:3px 5px;
+    border:1px solid rgba(255,255,255,.28);border-radius:5px;
+    background:rgba(8,7,11,.9);color:#ff9ec8;
+    font:900 7px "Courier New",monospace
+  }
+  .password-gate{
+    position:absolute;inset:0;z-index:110;display:grid;place-items:center;
+    padding:22px;background:rgba(4,4,7,.9)
+  }
+  .password-gate.hidden{display:none}
+  .password-terminal{
+    width:min(540px,92%);padding:22px;border:2px solid #92e8ff;border-radius:16px;
+    background:#090b10;box-shadow:inset 0 0 34px rgba(0,0,0,.9),0 0 28px rgba(146,232,255,.18);
+    color:#fff;text-align:left;font-family:"Courier New",monospace
+  }
+  .password-terminal .terminal-kicker{color:#92e8ff;font-weight:900;letter-spacing:2px;font-size:12px}
+  .password-terminal h2{margin:8px 0 4px;font-size:clamp(24px,4vw,42px)}
+  .password-terminal .status{color:#ff9ec8;font-weight:900;letter-spacing:1px}
+  .password-terminal p{margin:18px 0 6px}
+  .password-terminal input{
+    width:100%;margin:6px auto 9px;padding:13px 14px;
+    border:2px solid #ffe46b;border-radius:8px;background:#030304;color:#ffe46b;
+    text-transform:uppercase;font:900 clamp(18px,3vw,28px) "Courier New",monospace;
+    outline:none;cursor:text
+  }
+  .password-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .password-actions button{
+    padding:10px 15px;border:2px solid #fff;border-radius:8px;
+    background:#ef5f9a;color:white;font:900 12px "Courier New",monospace;cursor:none
+  }
+  .password-actions .cancel{background:#25232a}
+  #passwordMessage{min-height:46px;margin-top:12px;color:#ff9ec8;font-weight:900;white-space:pre-line}
+  #passwordMessage.success{color:#83ffae}
+</style>
+
+
+<style id="episodeUnlockV74Polish">
+  .password-terminal{
+    position:relative;
+    overflow:hidden;
+  }
+
+  .password-terminal::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:.16;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 3px,
+        rgba(255,255,255,.08) 4px
+      );
+  }
+
+  .password-terminal::after{
+    content:"";
+    position:absolute;
+    inset:-30%;
+    pointer-events:none;
+    background:linear-gradient(
+      90deg,
+      transparent 0 46%,
+      rgba(146,232,255,.08) 50%,
+      transparent 54% 100%
+    );
+    animation:terminalSweep 5s linear infinite;
+  }
+
+  @keyframes terminalSweep{
+    from{transform:translateX(-35%)}
+    to{transform:translateX(35%)}
+  }
+
+  #episodePasswordInput{
+    caret-color:#92e8ff;
+  }
+
+  #episodePasswordInput:focus{
+    box-shadow:0 0 0 2px rgba(146,232,255,.22),0 0 18px rgba(146,232,255,.18);
+  }
+
+  .runtime-local-note{
+    position:absolute;
+    inset:0;
+    z-index:18;
+    display:none;
+    place-items:center;
+    padding:24px;
+    background:#050505;
+    color:#fff;
+    text-align:center;
+    font:900 14px "Courier New",monospace;
+  }
+
+  .runtime-local-note.active{display:grid}
+
+  .runtime-local-note div{
+    width:min(500px,90%);
+    padding:20px;
+    border:2px solid #92e8ff;
+    border-radius:14px;
+    background:#0b0e12;
+  }
+
+  .runtime-local-note strong{
+    display:block;
+    margin-bottom:10px;
+    color:#ff9ec8;
+    font-size:18px;
+  }
+</style>
+
 </head>
 <body>
 <main class="episode-stage">
@@ -169,14 +289,30 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 <div class="landscape-screen">
 <div class="desktop">
 <header class="topbar">
-<div><h1>WIND PYTHON<br>EPISODES</h1><p class="subtitle">Tap a floppy disk to load an episode.</p></div>
+<div><h1>WIND PYTHON<br>EPISODES</h1><p class="subtitle">Every episode file is encrypted. Knowledge is the key.</p></div>
 <a class="home" href="index.html">HOME</a>
 </header>
 <div class="apps">
 <button class="episode-app ep1" data-episode="1" data-title="Waiting Room"><span class="floppy"><span class="window"></span><span class="num">01</span></span><span class="label">Episode One</span></button><button class="episode-app ep2" data-episode="2" data-title="Episode Two"><span class="floppy"><span class="window"></span><span class="num">02</span></span><span class="label">Episode Two</span></button><button class="episode-app ep3" data-episode="3" data-title="Episode Three"><span class="floppy"><span class="window"></span><span class="num">03</span></span><span class="label">Episode Three</span></button><button class="episode-app ep4" data-episode="4" data-title="Episode Four"><span class="floppy"><span class="window"></span><span class="num">04</span></span><span class="label">Episode Four</span></button><button class="episode-app ep5" data-episode="5" data-title="Episode Five"><span class="floppy"><span class="window"></span><span class="num">05</span></span><span class="label">Episode Five</span></button>
 </div>
-<div class="hint">SINGLE CLICK TO WATCH</div>
+<div class="hint">SELECT A LOCKED FILE · ENTER ITS ACCESS KEY</div>
 </div>
+
+<div id="episodePasswordGate" class="password-gate hidden" aria-hidden="true">
+  <form id="episodePasswordForm" class="password-terminal">
+    <div class="terminal-kicker">BAZINGAOS // ENCRYPTED ARCHIVE TERMINAL</div>
+    <h2 id="passwordEpisodeTitle">EPISODE FILE 01</h2>
+    <div class="status">STATUS: LOCKED</div>
+    <p>ENTER ACCESS KEY</p>
+    <input id="episodePasswordInput" type="text" autocomplete="off" spellcheck="false" aria-label="Episode access key">
+    <div class="password-actions">
+      <button type="submit">UNLOCK</button>
+      <button id="passwordCancel" class="cancel" type="button">CANCEL</button>
+    </div>
+    <div id="passwordMessage" aria-live="polite"></div>
+  </form>
+</div>
+
 <section class="viewer hidden" id="viewer">
 <div class="viewer-top"><div class="viewer-title" id="viewerTitle">EPISODE</div><button class="close" id="close">CLOSE</button></div>
 <div class="video" id="video"></div>
@@ -187,52 +323,285 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 </main>
 <script src="script.js"></script>
 <script src="cursor.js"></script>
-<script>
-const viewer=document.getElementById("viewer");
-const title=document.getElementById("viewerTitle");
-const video=document.getElementById("video");
-document.querySelectorAll(".episode-app").forEach(app=>app.addEventListener("click",()=>{
- const n=app.dataset.episode,t=app.dataset.title;
- title.textContent=t.toUpperCase();
- video.innerHTML=`<div class="placeholder"><span class="big-num">${String(n).padStart(2,"0")}</span><span class="ep-title">${t.toUpperCase()}</span><span class="coming">VIDEO PLACEHOLDER · COMING SOON</span></div>`;
- viewer.classList.remove("hidden");
-}));
-document.getElementById("close").addEventListener("click",()=>{viewer.classList.add("hidden");video.innerHTML=""});
-</script>
+
 
 <div id="episodeRuntime" class="episode-runtime" aria-hidden="true">
   <div class="runtime-panel">
     <div class="runtime-header"><span>BAZINGAOS // EPISODE ARCHIVE</span><button id="runtimeBack" class="runtime-back">◄ BACK TO EPISODES</button></div>
     <div class="runtime-stage">
       <div id="fileLoader" class="file-loader">
-        <div class="loader-title">FILE FOUND</div>
-        <div class="loader-file">WAITING_ROOM.VID</div>
+        <div id="loaderTitle" class="loader-title">FILE FOUND</div>
+        <div id="loaderFile" class="loader-file">A:\\EPISODE01.DAT</div>
         <div id="loaderStatus" class="loader-status">Preparing file...</div>
         <div class="loader-track"><div id="loaderFill" class="loader-fill"></div></div>
         <div id="loaderPercent" class="loader-percent">0%</div>
       </div>
       <div id="crtFlash" class="crt-flash"></div>
+      
+      <div id="runtimeLocalNote" class="runtime-local-note">
+        <div>
+          <strong>VIDEO STREAM BLOCKED</strong>
+          This episode may not load when the website is opened directly as a local file.
+          Upload the build to GitHub Pages or run it through a local web server.
+        </div>
+      </div>
+
+      <div id="runtimePlaceholder" class="runtime-local-note">
+        <div>
+          <strong id="placeholderTitle">EPISODE FILE READY</strong>
+          <span id="placeholderText">VIDEO PLACEHOLDER · COMING SOON</span>
+        </div>
+      </div>
       <div id="youtubeShell" class="youtube-shell">
         <iframe id="waitingRoomFrame" title="Wind Python - Waiting Room" src="" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
       </div>
     </div>
-    <div class="runtime-footer"><span>EPISODE 01</span><span>REMOTE VIDEO STREAM</span></div>
+    <div class="runtime-footer"><span id="runtimeEpisodeLabel">EPISODE 01</span><span id="runtimeSourceLabel">REMOTE VIDEO STREAM</span></div>
   </div>
 </div>
 
 
-<script>
-document.addEventListener("DOMContentLoaded",()=>{const r=document.getElementById("episodeRuntime"),b=document.getElementById("runtimeBack"),l=document.getElementById("fileLoader"),f=document.getElementById("loaderFill"),p=document.getElementById("loaderPercent"),s=document.getElementById("loaderStatus"),c=document.getElementById("crtFlash"),y=document.getElementById("youtubeShell"),i=document.getElementById("waitingRoomFrame");const q=[...document.querySelectorAll(".episode,.episode-icon,.floppy-app,[data-episode],button")].filter(e=>/waiting room|episode/i.test(e.textContent||""));const w=q.find(e=>/waiting room/i.test(e.textContent||""))||q[0];q.filter(e=>e!==w && !e.closest("#episodeRuntime")).forEach(e=>{e.classList.add("locked-episode");e.addEventListener("click",n=>{n.preventDefault();n.stopPropagation()},true)});let t=null,x=0;const a=[[12,"Locating episode file..."],[29,"Reading floppy index..."],[47,"Verifying WAITING_ROOM.VID..."],[68,"Connecting to remote archive..."],[86,"Buffering strange little film..."],[100,"Opening episode..."]];function z(){clearInterval(t);x=0;l.style.display="grid";y.classList.remove("active");c.classList.remove("go");f.style.width="0%";p.textContent="0%";s.textContent="Preparing file...";i.src=""}function h(){
-      clearInterval(t);
-      i.src="";
-      y.classList.remove("active");
-      c.classList.add("go");
-      setTimeout(()=>{
-        z();
-        r.classList.remove("active");
-        r.setAttribute("aria-hidden","true");
-      },260);
-    }function o(){z();r.classList.add("active");r.setAttribute("aria-hidden","false");t=setInterval(()=>{const d=a[x];f.style.width=d[0]+"%";p.textContent=d[0]+"%";s.textContent=d[1];x++;if(x>=a.length){clearInterval(t);setTimeout(()=>{c.classList.add("go");setTimeout(()=>{l.style.display="none";y.classList.add("active");i.src="https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1"},420)},340)}},360)}if(w)w.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();o()},true);b.addEventListener("click",h);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&r.classList.contains("active"))h()})});
+<script id="episodeAccessController">
+document.addEventListener("DOMContentLoaded",()=>{
+  const EPISODES = {
+    "1": {
+      code: "GINGER PUBES",
+      title: "WAITING ROOM",
+      file: "A:\\EPISODE01.DAT",
+      video: "https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1"
+    },
+    "2": {
+      code: "FARTMOUTH",
+      title: "EPISODE TWO",
+      file: "A:\\EPISODE02.DAT",
+      video: ""
+    },
+    "3": { code: "", title: "EPISODE THREE", file: "A:\\EPISODE03.DAT", video: "" },
+    "4": { code: "", title: "EPISODE FOUR", file: "A:\\EPISODE04.DAT", video: "" },
+    "5": { code: "", title: "EPISODE FIVE", file: "A:\\EPISODE05.DAT", video: "" }
+  };
+
+  // In-memory only. Reloading, leaving, or closing the page locks everything again.
+  const unlockedThisVisit = new Set();
+
+  const apps = [...document.querySelectorAll(".episode-app")];
+  const gate = document.getElementById("episodePasswordGate");
+  const form = document.getElementById("episodePasswordForm");
+  const input = document.getElementById("episodePasswordInput");
+  const cancel = document.getElementById("passwordCancel");
+  const message = document.getElementById("passwordMessage");
+  const passwordEpisodeTitle = document.getElementById("passwordEpisodeTitle");
+
+  const runtime = document.getElementById("episodeRuntime");
+  const runtimeBack = document.getElementById("runtimeBack");
+  const loader = document.getElementById("fileLoader");
+  const loaderTitle = document.getElementById("loaderTitle");
+  const loaderFile = document.getElementById("loaderFile");
+  const loaderFill = document.getElementById("loaderFill");
+  const loaderPercent = document.getElementById("loaderPercent");
+  const loaderStatus = document.getElementById("loaderStatus");
+  const crtFlash = document.getElementById("crtFlash");
+  const youtubeShell = document.getElementById("youtubeShell");
+  const frame = document.getElementById("waitingRoomFrame");
+  const localNote = document.getElementById("runtimeLocalNote");
+  const runtimePlaceholder = document.getElementById("runtimePlaceholder");
+  const placeholderTitle = document.getElementById("placeholderTitle");
+  const placeholderText = document.getElementById("placeholderText");
+  const runtimeEpisodeLabel = document.getElementById("runtimeEpisodeLabel");
+  const runtimeSourceLabel = document.getElementById("runtimeSourceLabel");
+
+  let selectedEpisode = "1";
+  let timer = null;
+  let verifyTimer = null;
+
+  function normalize(value){
+    return value.trim().replace(/\s+/g," ").toUpperCase();
+  }
+
+  function episodeNumber(episode){
+    return String(episode).padStart(2,"0");
+  }
+
+  function openGate(episode){
+    selectedEpisode = episode;
+    input.value = "";
+    message.textContent = "";
+    message.className = "";
+    passwordEpisodeTitle.textContent = "ACCESS FILE " + episodeNumber(episode);
+    gate.classList.remove("hidden");
+    gate.setAttribute("aria-hidden","false");
+    setTimeout(()=>input.focus(),60);
+  }
+
+  function closeGate(){
+    clearTimeout(verifyTimer);
+    gate.classList.add("hidden");
+    gate.setAttribute("aria-hidden","true");
+    input.blur();
+  }
+
+  function resetRuntime(){
+    clearInterval(timer);
+    loader.style.display = "grid";
+    loaderTitle.textContent = "FILE FOUND";
+    loaderFill.style.width = "0%";
+    loaderPercent.textContent = "0%";
+    loaderStatus.textContent = "Preparing file...";
+    crtFlash.classList.remove("go");
+    youtubeShell.classList.remove("active");
+    runtimePlaceholder.classList.remove("active");
+    localNote.classList.remove("active");
+    frame.src = "";
+  }
+
+  function closeRuntime(){
+    clearInterval(timer);
+    frame.src = "";
+    crtFlash.classList.add("go");
+    setTimeout(()=>{
+      resetRuntime();
+      runtime.classList.remove("active");
+      runtime.setAttribute("aria-hidden","true");
+    },260);
+  }
+
+  function revealEpisode(episode){
+    const data = EPISODES[episode];
+
+    if(data.video){
+      if(window.location.protocol === "file:"){
+        localNote.classList.add("active");
+      }else{
+        youtubeShell.classList.add("active");
+        frame.src = data.video;
+      }
+    }else{
+      placeholderTitle.textContent = data.title;
+      placeholderText.textContent = "ACCESS GRANTED · VIDEO FILE COMING SOON";
+      runtimePlaceholder.classList.add("active");
+    }
+  }
+
+  function openRuntime(episode){
+    const data = EPISODES[episode];
+    resetRuntime();
+
+    loaderFile.textContent = data.file;
+    runtimeEpisodeLabel.textContent = "EPISODE " + episodeNumber(episode);
+    runtimeSourceLabel.textContent = data.video ? "REMOTE VIDEO STREAM" : "ARCHIVE PLACEHOLDER";
+
+    runtime.classList.add("active");
+    runtime.setAttribute("aria-hidden","false");
+
+    const stages = [
+      [12,"READING FLOPPY INDEX..."],
+      [28,"VERIFYING ACCESS HEADER..."],
+      [46,"MATCH FOUND..."],
+      [64,"MOUNTING FLOPPY..."],
+      [82,"READING " + data.file + "..."],
+      [100,"OPENING EPISODE FILE..."]
+    ];
+
+    let step = 0;
+    timer = setInterval(()=>{
+      const stage = stages[step];
+      loaderFill.style.width = stage[0] + "%";
+      loaderPercent.textContent = stage[0] + "%";
+      loaderStatus.textContent = stage[1];
+      step++;
+
+      if(step >= stages.length){
+        clearInterval(timer);
+        setTimeout(()=>{
+          crtFlash.classList.add("go");
+          setTimeout(()=>{
+            loader.style.display = "none";
+            revealEpisode(episode);
+          },420);
+        },300);
+      }
+    },360);
+  }
+
+  apps.forEach(app=>{
+    app.classList.add("is-locked");
+
+    app.addEventListener("click",event=>{
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const episode = app.dataset.episode;
+
+      if(unlockedThisVisit.has(episode)){
+        openRuntime(episode);
+      }else{
+        openGate(episode);
+      }
+    },true);
+  });
+
+  form.addEventListener("submit",event=>{
+    event.preventDefault();
+
+    const data = EPISODES[selectedEpisode];
+    const entered = normalize(input.value);
+    const required = normalize(data.code);
+
+    if(!required){
+      message.textContent =
+        "ACCESS DENIED\nNO VALID KEY HAS BEEN ISSUED FOR THIS FILE";
+      message.className = "";
+      input.select();
+      return;
+    }
+
+    if(entered !== required){
+      message.textContent =
+        "ACCESS DENIED\nUNKNOWN ACCESS KEY";
+      message.className = "";
+      input.select();
+      return;
+    }
+
+    input.disabled = true;
+    message.className = "success";
+    message.textContent = "VERIFYING...";
+
+    verifyTimer = setTimeout(()=>{
+      message.textContent = "MATCH FOUND";
+      verifyTimer = setTimeout(()=>{
+        message.textContent =
+          "ACCESS GRANTED\nMOUNTING FLOPPY...";
+        unlockedThisVisit.add(selectedEpisode);
+
+        verifyTimer = setTimeout(()=>{
+          input.disabled = false;
+          const episodeToOpen = selectedEpisode;
+          closeGate();
+          openRuntime(episodeToOpen);
+        },650);
+      },500);
+    },500);
+  });
+
+  cancel.addEventListener("click",()=>{
+    input.disabled = false;
+    closeGate();
+  });
+
+  runtimeBack.addEventListener("click",closeRuntime);
+
+  document.addEventListener("keydown",event=>{
+    if(event.key !== "Escape") return;
+
+    if(!gate.classList.contains("hidden")){
+      input.disabled = false;
+      closeGate();
+    }else if(runtime.classList.contains("active")){
+      closeRuntime();
+    }
+  });
+});
 </script>
 
 </body>
