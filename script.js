@@ -1,15 +1,32 @@
 const unlockSound=new Audio("assets/audio/unlockphone.mp3");
 unlockSound.preload="auto";
 unlockSound.playsInline=true;
-let phoneUnlocked=false;
-function playUnlockSound(){
+unlockSound.load();
+
+let unlockSoundPlayedForGesture=false;
+
+function playUnlockSoundFromGesture(){
+  if(unlockSoundPlayedForGesture) return;
+  unlockSoundPlayedForGesture=true;
+
   try{
     unlockSound.pause();
     unlockSound.currentTime=0;
     unlockSound.volume=1;
+
     const attempt=unlockSound.play();
-    if(attempt && typeof attempt.catch==="function") attempt.catch(()=>{});
-  }catch(_){}
+    if(attempt && typeof attempt.catch==="function"){
+      attempt.catch(()=>{
+        unlockSoundPlayedForGesture=false;
+      });
+    }
+  }catch(_){
+    unlockSoundPlayedForGesture=false;
+  }
+}
+
+function resetUnlockSoundGesture(){
+  unlockSoundPlayedForGesture=false;
 }
 const lockScreen = document.getElementById("lockScreen");
 const homeScreen = document.getElementById("homeScreen");
@@ -74,13 +91,17 @@ function moveDrag(clientX) {
 function endDrag() {
   if (!dragging) return;
   dragging = false;
+
   const left = parseFloat(getComputedStyle(unlockHandle).left) || 4;
   const ratio = left / getMaxLeft();
+
   if (ratio >= 0.93) {
-    playUnlockSound();
-    unlockPhone(false);
+    playUnlockSoundFromGesture();
+    unlockPhone();
     return;
   }
+
+  resetUnlockSoundGesture();
   unlockHandle.style.transition = "left .2s ease";
   unlockFill.style.transition = "width .2s ease";
   setHandle(4);
@@ -90,11 +111,8 @@ function endDrag() {
   }, 220);
 }
 
-function unlockPhone(playSound=true) {
-  if(phoneUnlocked) return;
-  phoneUnlocked=true;
-  if(playSound) playUnlockSound();
-  dragging=false;
+function unlockPhone() {
+  dragging = false;
   lockScreen.classList.add("unlocking");
   setTimeout(() => {
     lockScreen.classList.add("hidden");
@@ -103,6 +121,7 @@ function unlockPhone(playSound=true) {
 }
 
 unlockHandle.addEventListener("pointerdown", (event) => {
+  resetUnlockSoundGesture();
   unlockHandle.setPointerCapture(event.pointerId);
   beginDrag(event.clientX);
 });
@@ -111,9 +130,3 @@ unlockHandle.addEventListener("pointermove", (event) => moveDrag(event.clientX))
 unlockHandle.addEventListener("pointerup", endDrag);
 unlockHandle.addEventListener("pointercancel", endDrag);
 
-unlockHandle.addEventListener("click", () => {
-  if (!dragging && !phoneUnlocked) {
-    playUnlockSound();
-    unlockPhone(false);
-  }
-});

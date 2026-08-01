@@ -109,11 +109,26 @@
   .title-kicker{font:900 9px "Courier New",monospace;color:#68e5ff;letter-spacing:2px;margin-bottom:8px}
   .title-logo{font:900 42px/.86 "Courier New",monospace;color:#ffe351;text-shadow:5px 5px #7c244f;margin:0 0 14px}
   .title-walkers{height:84px;position:relative;overflow:hidden;margin:6px 0 14px;border-bottom:3px solid rgba(255,255,255,.18)}
-  .title-walkers img{position:absolute;left:0;bottom:0;display:block;object-fit:contain;max-width:none;will-change:transform;animation:5s linear infinite both}
-  .title-wp{height:68px;z-index:2;animation-name:titleWpChase}
-  .title-nathaniel{height:65px;z-index:1;animation-name:titleNathanielChase;animation-delay:1s}
-  @keyframes titleWpChase{from{transform:translateX(-100px)}to{transform:translateX(520px)}}
-  @keyframes titleNathanielChase{from{transform:translateX(-100px)}to{transform:translateX(520px)}}
+  .title-walkers img{
+    position:absolute;left:0;bottom:0;display:block;
+    object-fit:contain;max-width:none;will-change:transform;
+  }
+  .title-wp{
+    height:68px;z-index:2;
+    animation:titleWpChase 4.8s linear infinite;
+  }
+  .title-nathaniel{
+    height:65px;z-index:1;
+    animation:titleNathanielChase 4.8s linear .9s infinite;
+  }
+  @keyframes titleWpChase{
+    0%{transform:translateX(-95px)}
+    100%{transform:translateX(455px)}
+  }
+  @keyframes titleNathanielChase{
+    0%{transform:translateX(-95px)}
+    100%{transform:translateX(455px)}
+  }to{transform:translateX(520px)}}
 
   .ready-overlay{background:rgba(4,2,7,.42);pointer-events:none}
   .ready-card{text-align:center}
@@ -187,8 +202,14 @@
   .dpad .left{left:0;top:41px}
   .dpad .right{right:0;top:41px}
 
-  .console-buttons{min-width:112px;display:flex;flex-direction:column;align-items:center;gap:10px}
-  #pauseBtn{min-width:104px;padding:10px 14px;border:2px solid #b9afc0;border-radius:999px;background:#625969;color:#fff;box-shadow:0 4px 0 #17131b;font:900 12px "Courier New",monospace}
+  .console-buttons{min-width:146px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .system-button-row{display:flex;gap:8px;align-items:center;justify-content:center}
+  #homeBtn,#pauseBtn{
+    min-width:66px;padding:9px 10px;border:2px solid #b9afc0;border-radius:999px;
+    background:#625969;color:#fff;box-shadow:0 4px 0 #17131b;
+    font:900 10px "Courier New",monospace;
+  }
+  #homeBtn:active,#pauseBtn:active{transform:translateY(2px);box-shadow:0 2px 0 #17131b}
   .console-buttons span{color:#c1b6c7;font:900 8px "Courier New",monospace;letter-spacing:2px}
 </style>
 </head>
@@ -274,7 +295,10 @@
         <button class="right" data-dir="right" aria-label="Move right">▶</button>
       </div>
       <div class="console-buttons">
-        <button id="pauseBtn" type="button">PAUSE</button>
+        <div class="system-button-row">
+          <button id="homeBtn" type="button">HOME</button>
+          <button id="pauseBtn" type="button">PAUSE</button>
+        </div>
         <span>BAZINGAOS</span>
       </div>
     </div>
@@ -293,6 +317,7 @@
   const titlePanel = document.getElementById("titlePanel");
   const titleStartButton = document.getElementById("titleStartButton");
   const pauseBtn = document.getElementById("pauseBtn");
+  const homeBtn = document.getElementById("homeBtn");
   const victoryVhs = document.getElementById("victoryVhs");
   const startPanel = document.getElementById("startPanel");
   const readyPanel = document.getElementById("readyPanel");
@@ -898,6 +923,18 @@
     if(embeddedMode && window.parent !== window){
       event.preventDefault();
       window.parent.postMessage("close-chase-app","*");
+    }
+  });
+
+  homeBtn.addEventListener("click",()=>{
+    stopTitleLoop();
+    gameMusic.pause();
+    stopAllCharacterAudio();
+
+    if(embeddedMode && window.parent !== window){
+      window.parent.postMessage("close-chase-app","*");
+    }else{
+      window.location.href="index.html";
     }
   });
 
