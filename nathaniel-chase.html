@@ -81,7 +81,8 @@
     background:linear-gradient(rgba(5,3,10,.96),rgba(5,3,10,.55),transparent);
   }
   .back{color:#fff;text-decoration:none;border:2px solid #7b5d8c;background:#1b1022;padding:6px 8px}
-  .hud{text-align:right;text-shadow:2px 2px #000}
+  .hud{display:none!important;}
+.hud{text-align:right;text-shadow:2px 2px #000}
   .hud strong{color:#ffe351}
 
   .overlay{
@@ -255,6 +256,24 @@
       line-height:1.22!important;
     }
   }
+
+
+.console-hud{
+ position:absolute;
+ left:50%;
+ bottom:84px;
+ transform:translateX(-50%);
+ display:flex;
+ gap:22px;
+ align-items:center;
+ font:900 13px "Courier New",monospace;
+ color:#fff;
+ text-shadow:2px 2px 0 #000;
+ z-index:20;
+ pointer-events:none;
+}
+.console-hud .label{color:#cfc3d9;}
+.console-hud .value{color:#ffe351;min-width:34px;display:inline-block;text-align:left;}
 
 </style>
 </head>
@@ -456,7 +475,7 @@
           window.matchMedia("(max-width:760px)").matches;
 
         // Mobile remains at 8%. Desktop is 15% louder at 9.2%.
-        gameMusicGain.gain.value = isMobileAudio ? 0.08 : 0.092;
+        gameMusicGain.gain.value = isMobileAudio ? 0.08 : 0.11;
 
         gameMusicSource.connect(gameMusicGain);
         gameMusicGain.connect(gameMusicContext.destination);
@@ -472,7 +491,7 @@
           window.matchMedia("(max-width:760px)").matches;
 
         gameMusicGain.gain.setValueAtTime(
-          isMobileAudio ? 0.08 : 0.092,
+          isMobileAudio ? 0.08 : 0.11,
           gameMusicContext.currentTime
         );
       }
@@ -1176,6 +1195,31 @@ document.addEventListener("keydown", function(event){
   });
 
   observer.observe(pauseBtn, {childList:true, subtree:true, characterData:true});
+})();
+</script>
+
+
+<div class="console-hud" id="consoleHud">
+ <span><span class="label">SCORE</span> <span class="value" id="hudScoreBody">0000</span></span>
+ <span><span class="label">LIVES</span> <span class="value" id="hudLivesBody">4</span></span>
+ <span><span class="label">CAPTURED</span> <span class="value" id="hudCapturedBody">0/5</span></span>
+</div>
+
+
+<script>
+(function(){
+ const map=[
+ ['scoreValue','hudScoreBody'],
+ ['livesValue','hudLivesBody'],
+ ['caughtValue','hudCapturedBody']
+ ];
+ function sync(){
+   map.forEach(([a,b])=>{
+     const s=document.getElementById(a), d=document.getElementById(b);
+     if(s&&d) d.textContent=s.textContent;
+   });
+ }
+ setInterval(sync,100);
 })();
 </script>
 
