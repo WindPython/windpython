@@ -285,8 +285,8 @@
       <div class="win-checks hidden" id="winChecks">✓✓✓✓✓</div>
       <div class="access-reward hidden" id="accessReward">
         <div class="reward-label">EPISODE 02 ACCESS KEY</div>
-        <div class="reward-code">FARTMOUTH</div>
-        <div class="reward-note">Remember it. Passwords are not case-sensitive.</div>
+        <div class="reward-code">FART MOUTH</div>
+        <div class="reward-note">Use it to unlock Episode 02.</div>
       </div>
         <button id="restartBtn">PLAY AGAIN</button>
       </div>
@@ -397,7 +397,52 @@
   const gameMusic = new Audio("assets/audio/nathaniel-game-music.mp3");
   gameMusic.preload = "auto";
   gameMusic.loop = true;
-  gameMusic.volume = 0.0875;
+  gameMusic.volume = 0.08;
+
+  let gameMusicContext = null;
+  let gameMusicSource = null;
+  let gameMusicGain = null;
+
+  function prepareGameMusicVolume(){
+    try{
+      if(!gameMusicContext){
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if(!AudioContextClass) return;
+
+        gameMusicContext = new AudioContextClass();
+        gameMusicSource = gameMusicContext.createMediaElementSource(gameMusic);
+        gameMusicGain = gameMusicContext.createGain();
+
+        // 8% gain, including on mobile Safari where element.volume may be ignored.
+        gameMusicGain.gain.value = 0.08;
+
+        gameMusicSource.connect(gameMusicGain);
+        gameMusicGain.connect(gameMusicContext.destination);
+      }
+
+      if(gameMusicContext.state === "suspended"){
+        gameMusicContext.resume().catch(()=>{});
+      }
+
+      if(gameMusicGain){
+        gameMusicGain.gain.setValueAtTime(0.08, gameMusicContext.currentTime);
+      }
+    }catch(_){}
+  }
+
+  function stopParentChaseMusic(){
+    if(!embeddedMode || window.parent === window) return;
+
+    try{
+      const parentAudio = window.parent.document.getElementById("chaseLauncherAudio");
+      if(parentAudio){
+        parentAudio.pause();
+        parentAudio.currentTime = 0;
+      }
+    }catch(_){}
+
+    window.parent.postMessage("chase-game-started","*");
+  }
   const endPanel = document.getElementById("endPanel");
   const endTitle = document.getElementById("endTitle");
   const endSub = document.getElementById("endSub");
@@ -447,7 +492,7 @@
   const buttBurgerImg = new Image();
   buttBurgerImg.src = "assets/images/nathaniel-chase/butt-burger.png";
 
-  let pellets, powerups, player, enemies, score, lives, caughtNathaniels, running, pausedByUser=false, powerTimer, lastTime, moveAccumulator, enemyAccumulator, readyTimer, enemyMoveCounter=0, captureAnimations=[], currentEnemyStepTime=.39;
+  let pellets, powerups, player, enemies, score, lives, caughtNathaniels, running, pausedByUser=false, powerTimer, lastTime, moveAccumulator, enemyAccumulator, readyTimer, enemyMoveCounter=0, captureAnimations=[], currentEnemyStepTime=.39, waitingForDirection=false;
 
   function key(x,y){ return x+","+y; }
   function walkable(x,y){
@@ -572,6 +617,8 @@
     gotchaSound.play().catch(()=>{});
 
     player={x:6,y:11,prevX:6,prevY:11,dir:"right",next:"right",facing:1};
+    waitingForDirection=true;
+    moveAccumulator=0;
     enemies.forEach((e,i)=>{
       e.x=e.home.x;e.y=e.home.y;
       e.prevX=e.home.x;e.prevY=e.home.y;
@@ -608,6 +655,8 @@
   }
 
   function playerStep(){
+    if(waitingForDirection) return;
+
     if(moveEntity(player,player.next)) player.dir=player.next;
     else moveEntity(player,player.dir);
 
@@ -764,14 +813,14 @@
     const cy=pos.y*TILE+18;
     const bob=running ? Math.sin(performance.now()/130)*0.7 : 0;
 
-    if(!running){
+    if(!running || waitingForDirection){
       ctx.save();
       ctx.fillStyle="#ffe351";
       ctx.fillRect(player.x*TILE+3,player.y*TILE+25,TILE-6,4);
       ctx.fillStyle="#fff";
       ctx.font='bold 7px "Courier New"';
       ctx.textAlign="center";
-      ctx.fillText("START",player.x*TILE+16,player.y*TILE+31);
+      ctx.fillText(waitingForDirection ? "MOVE" : "START",player.x*TILE+16,player.y*TILE+31);
       ctx.restore();
     }
 
@@ -846,6 +895,8 @@
   }
 
   function start(){
+    prepareGameMusicVolume();
+    stopParentChaseMusic();
     pausedByUser=false;
     pauseBtn.textContent="PAUSE";
     victoryVhs.classList.add("hidden");
@@ -859,6 +910,7 @@
     gameMusic.currentTime=0;
     gameMusic.play().catch(()=>{});
     resetLevel(true);
+    waitingForDirection=false;
     running=false;
     startPanel.classList.add("hidden");
     endPanel.classList.add("hidden");
@@ -899,14 +951,10 @@
     if(won){
       stopAllCharacterAudio(winSound);
       winSound.volume=1;
-      victoryVhs.classList.remove("hidden");
-      victoryVhs.setAttribute("aria-hidden","false");
-      setTimeout(()=>{winSound.play().catch(()=>{});},80);
-      setTimeout(()=>{
-        victoryVhs.classList.add("hidden");
-        victoryVhs.setAttribute("aria-hidden","true");
-        endPanel.classList.remove("hidden");
-      },2600);
+      victoryVhs.classList.add("hidden");
+      victoryVhs.setAttribute("aria-hidden","true");
+      endPanel.classList.remove("hidden");
+      winSound.play().catch(()=>{});
     }else{
       stopAllCharacterAudio(loseSound);
       loseSound.play().catch(()=>{});
@@ -914,7 +962,12 @@
     }
   }
 
-  function setDirection(dir){ if(dirs[dir]) player.next=dir; }
+  function setDirection(dir){
+    if(!dirs[dir]) return;
+    player.next=dir;
+    player.dir=dir;
+    waitingForDirection=false;
+  }
 
   addEventListener("keydown",e=>{
     const mapKeys={
@@ -986,15 +1039,15 @@
       gameMusic.pause();
       runSound.pause();
     }else if(endPanel.classList.contains("hidden") && victoryVhs.classList.contains("hidden")){
+      prepareGameMusicVolume();
       lastTime=performance.now();
       gameMusic.play().catch(()=>{});
     }
   });
 
   titleStartButton.addEventListener("click",()=>{
-    if(embeddedMode && window.parent !== window){
-      window.parent.postMessage("chase-game-started","*");
-    }
+    stopParentChaseMusic();
+    prepareGameMusicVolume();
     stopTitleLoop();
     titlePanel.classList.add("hidden");
     startPanel.classList.add("hidden");

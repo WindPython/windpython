@@ -163,17 +163,12 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 </style>
 
 <style id="episodePasswordUnlockStyles">
-  .ep1.is-locked{position:relative;opacity:.72}
-  .ep1.is-locked::after{
-    content:"LOCKED";position:absolute;right:3px;top:3px;padding:3px 5px;
+  .episode-app{position:relative;opacity:.72}
+  .episode-app::after{
+    content:"LOCKED";
+    position:absolute;right:3px;top:3px;padding:3px 5px;
     border:1px solid rgba(255,255,255,.28);border-radius:5px;
     background:rgba(8,7,11,.9);color:#ff9ec8;
-    font:900 7px "Courier New",monospace
-  }
-  .ep1.is-unlocked::after{
-    content:"UNLOCKED";position:absolute;right:3px;top:3px;padding:3px 5px;
-    border:1px solid rgba(255,255,255,.28);border-radius:5px;
-    background:rgba(8,30,18,.92);color:#83ffae;
     font:900 7px "Courier New",monospace
   }
   .password-gate{
@@ -182,26 +177,27 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
   }
   .password-gate.hidden{display:none}
   .password-terminal{
-    width:min(520px,90%);padding:22px;border:2px solid #92e8ff;border-radius:16px;
+    width:min(540px,92%);padding:22px;border:2px solid #92e8ff;border-radius:16px;
     background:#090b10;box-shadow:inset 0 0 34px rgba(0,0,0,.9),0 0 28px rgba(146,232,255,.18);
-    color:#fff;text-align:center;font-family:"Courier New",monospace
+    color:#fff;text-align:left;font-family:"Courier New",monospace
   }
   .password-terminal .terminal-kicker{color:#92e8ff;font-weight:900;letter-spacing:2px;font-size:12px}
   .password-terminal h2{margin:8px 0 4px;font-size:clamp(24px,4vw,42px)}
   .password-terminal .status{color:#ff9ec8;font-weight:900;letter-spacing:1px}
+  .password-terminal p{margin:18px 0 6px}
   .password-terminal input{
-    width:min(390px,100%);margin:15px auto 9px;padding:13px 14px;
+    width:100%;margin:6px auto 9px;padding:13px 14px;
     border:2px solid #ffe46b;border-radius:8px;background:#030304;color:#ffe46b;
-    text-align:center;text-transform:uppercase;font:900 clamp(18px,3vw,28px) "Courier New",monospace;
+    text-transform:uppercase;font:900 clamp(18px,3vw,28px) "Courier New",monospace;
     outline:none;cursor:text
   }
-  .password-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .password-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
   .password-actions button{
     padding:10px 15px;border:2px solid #fff;border-radius:8px;
     background:#ef5f9a;color:white;font:900 12px "Courier New",monospace;cursor:none
   }
   .password-actions .cancel{background:#25232a}
-  #passwordMessage{min-height:22px;margin-top:10px;color:#ff9ec8;font-weight:900}
+  #passwordMessage{min-height:46px;margin-top:12px;color:#ff9ec8;font-weight:900;white-space:pre-line}
   #passwordMessage.success{color:#83ffae}
 </style>
 
@@ -293,22 +289,22 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 <div class="landscape-screen">
 <div class="desktop">
 <header class="topbar">
-<div><h1>WIND PYTHON<br>EPISODES</h1><p class="subtitle">Tap a floppy disk to load an episode.</p></div>
+<div><h1>WIND PYTHON<br>EPISODES</h1><p class="subtitle">Every episode file is encrypted. Knowledge is the key.</p></div>
 <a class="home" href="index.html">HOME</a>
 </header>
 <div class="apps">
 <button class="episode-app ep1" data-episode="1" data-title="Waiting Room"><span class="floppy"><span class="window"></span><span class="num">01</span></span><span class="label">Episode One</span></button><button class="episode-app ep2" data-episode="2" data-title="Episode Two"><span class="floppy"><span class="window"></span><span class="num">02</span></span><span class="label">Episode Two</span></button><button class="episode-app ep3" data-episode="3" data-title="Episode Three"><span class="floppy"><span class="window"></span><span class="num">03</span></span><span class="label">Episode Three</span></button><button class="episode-app ep4" data-episode="4" data-title="Episode Four"><span class="floppy"><span class="window"></span><span class="num">04</span></span><span class="label">Episode Four</span></button><button class="episode-app ep5" data-episode="5" data-title="Episode Five"><span class="floppy"><span class="window"></span><span class="num">05</span></span><span class="label">Episode Five</span></button>
 </div>
-<div class="hint">SINGLE CLICK TO WATCH</div>
+<div class="hint">SELECT A LOCKED FILE · ENTER ITS ACCESS KEY</div>
 </div>
 
 <div id="episodePasswordGate" class="password-gate hidden" aria-hidden="true">
   <form id="episodePasswordForm" class="password-terminal">
-    <div class="terminal-kicker">BAZINGAOS SECURITY</div>
-    <h2>EPISODE FILE 01</h2>
+    <div class="terminal-kicker">BAZINGAOS // ENCRYPTED ARCHIVE TERMINAL</div>
+    <h2 id="passwordEpisodeTitle">EPISODE FILE 01</h2>
     <div class="status">STATUS: LOCKED</div>
     <p>ENTER ACCESS KEY</p>
-    <input id="episodePasswordInput" type="text" autocomplete="off" spellcheck="false" aria-label="Episode one access key">
+    <input id="episodePasswordInput" type="text" autocomplete="off" spellcheck="false" aria-label="Episode access key">
     <div class="password-actions">
       <button type="submit">UNLOCK</button>
       <button id="passwordCancel" class="cancel" type="button">CANCEL</button>
@@ -327,21 +323,15 @@ h1{margin:0;color:#f4d35e;font-size:clamp(25px,4vw,42px);line-height:.88;text-sh
 </main>
 <script src="script.js"></script>
 <script src="cursor.js"></script>
-<script>
-/* Episode floppy clicks are handled by the password controller below. */
-document.getElementById("close").addEventListener("click",()=>{
-  document.getElementById("viewer").classList.add("hidden");
-  document.getElementById("video").innerHTML="";
-});
-</script>
+
 
 <div id="episodeRuntime" class="episode-runtime" aria-hidden="true">
   <div class="runtime-panel">
     <div class="runtime-header"><span>BAZINGAOS // EPISODE ARCHIVE</span><button id="runtimeBack" class="runtime-back">◄ BACK TO EPISODES</button></div>
     <div class="runtime-stage">
       <div id="fileLoader" class="file-loader">
-        <div class="loader-title">FILE FOUND</div>
-        <div class="loader-file">WAITING_ROOM.VID</div>
+        <div id="loaderTitle" class="loader-title">FILE FOUND</div>
+        <div id="loaderFile" class="loader-file">A:\\EPISODE01.DAT</div>
         <div id="loaderStatus" class="loader-status">Preparing file...</div>
         <div class="loader-track"><div id="loaderFill" class="loader-fill"></div></div>
         <div id="loaderPercent" class="loader-percent">0%</div>
@@ -356,82 +346,95 @@ document.getElementById("close").addEventListener("click",()=>{
         </div>
       </div>
 
+      <div id="runtimePlaceholder" class="runtime-local-note">
+        <div>
+          <strong id="placeholderTitle">EPISODE FILE READY</strong>
+          <span id="placeholderText">VIDEO PLACEHOLDER · COMING SOON</span>
+        </div>
+      </div>
       <div id="youtubeShell" class="youtube-shell">
         <iframe id="waitingRoomFrame" title="Wind Python - Waiting Room" src="" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
       </div>
     </div>
-    <div class="runtime-footer"><span>EPISODE 01</span><span>REMOTE VIDEO STREAM</span></div>
+    <div class="runtime-footer"><span id="runtimeEpisodeLabel">EPISODE 01</span><span id="runtimeSourceLabel">REMOTE VIDEO STREAM</span></div>
   </div>
 </div>
 
 
-<script id="episodePasswordController">
+<script id="episodeAccessController">
 document.addEventListener("DOMContentLoaded",()=>{
-  const EPISODES={
-    "1":{code:"GINGER PUBES",title:"WAITING ROOM",playable:true},
-    "2":{code:"FARTMOUTH",title:"EPISODE TWO",playable:false},
-    "3":{code:null,title:"EPISODE THREE",playable:false},
-    "4":{code:null,title:"EPISODE FOUR",playable:false},
-    "5":{code:null,title:"EPISODE FIVE",playable:false}
+  const EPISODES = {
+    "1": {
+      code: "GINGER PUBES",
+      title: "WAITING ROOM",
+      file: "A:\\EPISODE01.DAT",
+      video: "https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1"
+    },
+    "2": {
+      code: "FART MOUTH",
+      title: "EPISODE TWO",
+      file: "A:\\EPISODE02.DAT",
+      video: ""
+    },
+    "3": { code: "", title: "EPISODE THREE", file: "A:\\EPISODE03.DAT", video: "" },
+    "4": { code: "", title: "EPISODE FOUR", file: "A:\\EPISODE04.DAT", video: "" },
+    "5": { code: "", title: "EPISODE FIVE", file: "A:\\EPISODE05.DAT", video: "" }
   };
 
-  const gate=document.getElementById("episodePasswordGate");
-  const form=document.getElementById("episodePasswordForm");
-  const input=document.getElementById("episodePasswordInput");
-  const cancel=document.getElementById("passwordCancel");
-  const message=document.getElementById("passwordMessage");
-  const gateTitle=gate.querySelector("h2");
-  const gateKicker=gate.querySelector(".terminal-kicker");
-  const status=gate.querySelector(".status");
+  // In-memory only. Reloading, leaving, or closing the page locks everything again.
+  const unlockedThisVisit = new Set();
 
-  const runtime=document.getElementById("episodeRuntime");
-  const runtimeBack=document.getElementById("runtimeBack");
-  const loader=document.getElementById("fileLoader");
-  const loaderFill=document.getElementById("loaderFill");
-  const loaderPercent=document.getElementById("loaderPercent");
-  const loaderStatus=document.getElementById("loaderStatus");
-  const crtFlash=document.getElementById("crtFlash");
-  const youtubeShell=document.getElementById("youtubeShell");
-  const frame=document.getElementById("waitingRoomFrame");
-  const localNote=document.getElementById("runtimeLocalNote");
+  const apps = [...document.querySelectorAll(".episode-app")];
+  const gate = document.getElementById("episodePasswordGate");
+  const form = document.getElementById("episodePasswordForm");
+  const input = document.getElementById("episodePasswordInput");
+  const cancel = document.getElementById("passwordCancel");
+  const message = document.getElementById("passwordMessage");
+  const passwordEpisodeTitle = document.getElementById("passwordEpisodeTitle");
 
-  const viewer=document.getElementById("viewer");
-  const viewerTitle=document.getElementById("viewerTitle");
-  const video=document.getElementById("video");
+  const runtime = document.getElementById("episodeRuntime");
+  const runtimeBack = document.getElementById("runtimeBack");
+  const loader = document.getElementById("fileLoader");
+  const loaderTitle = document.getElementById("loaderTitle");
+  const loaderFile = document.getElementById("loaderFile");
+  const loaderFill = document.getElementById("loaderFill");
+  const loaderPercent = document.getElementById("loaderPercent");
+  const loaderStatus = document.getElementById("loaderStatus");
+  const crtFlash = document.getElementById("crtFlash");
+  const youtubeShell = document.getElementById("youtubeShell");
+  const frame = document.getElementById("waitingRoomFrame");
+  const localNote = document.getElementById("runtimeLocalNote");
+  const runtimePlaceholder = document.getElementById("runtimePlaceholder");
+  const placeholderTitle = document.getElementById("placeholderTitle");
+  const placeholderText = document.getElementById("placeholderText");
+  const runtimeEpisodeLabel = document.getElementById("runtimeEpisodeLabel");
+  const runtimeSourceLabel = document.getElementById("runtimeSourceLabel");
 
-  let selectedEpisode="1";
-  let timer=null;
-  let step=0;
-
-  const stages=[
-    [12,"Locating episode file..."],
-    [29,"Reading floppy index..."],
-    [47,"Verifying access key..."],
-    [68,"Mounting floppy..."],
-    [86,"Loading archive..."],
-    [100,"Opening episode..."]
-  ];
+  let selectedEpisode = "1";
+  let timer = null;
+  let verifyTimer = null;
 
   function normalize(value){
-    return value.trim().replace(/\s+/g," ").toUpperCase();
+    return value.trim().replace(/\s+/g,"").toUpperCase();
   }
 
-  function openGate(n){
-    selectedEpisode=n;
-    const ep=EPISODES[n];
-    message.textContent="";
-    message.className="";
-    input.value="";
-    if(gateKicker)gateKicker.textContent="BAZINGAOS // PASSWORD REQUIRED";
-    if(gateTitle)gateTitle.textContent="EPISODE "+String(n).padStart(2,"0");
-    if(status)status.textContent="ENTER ACCESS KEY";
-    input.setAttribute("aria-label","Episode "+n+" access key");
+  function episodeNumber(episode){
+    return String(episode).padStart(2,"0");
+  }
+
+  function openGate(episode){
+    selectedEpisode = episode;
+    input.value = "";
+    message.textContent = "";
+    message.className = "";
+    passwordEpisodeTitle.textContent = "ACCESS FILE " + episodeNumber(episode);
     gate.classList.remove("hidden");
     gate.setAttribute("aria-hidden","false");
-    setTimeout(()=>input.focus(),50);
+    setTimeout(()=>input.focus(),60);
   }
 
   function closeGate(){
+    clearTimeout(verifyTimer);
     gate.classList.add("hidden");
     gate.setAttribute("aria-hidden","true");
     input.blur();
@@ -439,22 +442,21 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   function resetRuntime(){
     clearInterval(timer);
-    step=0;
-    loader.style.display="grid";
-    youtubeShell.classList.remove("active");
-    localNote.classList.remove("active");
+    loader.style.display = "grid";
+    loaderTitle.textContent = "FILE FOUND";
+    loaderFill.style.width = "0%";
+    loaderPercent.textContent = "0%";
+    loaderStatus.textContent = "Preparing file...";
     crtFlash.classList.remove("go");
-    loaderFill.style.width="0%";
-    loaderPercent.textContent="0%";
-    loaderStatus.textContent="Preparing file...";
-    frame.src="";
+    youtubeShell.classList.remove("active");
+    runtimePlaceholder.classList.remove("active");
+    localNote.classList.remove("active");
+    frame.src = "";
   }
 
   function closeRuntime(){
     clearInterval(timer);
-    frame.src="";
-    youtubeShell.classList.remove("active");
-    localNote.classList.remove("active");
+    frame.src = "";
     crtFlash.classList.add("go");
     setTimeout(()=>{
       resetRuntime();
@@ -463,86 +465,140 @@ document.addEventListener("DOMContentLoaded",()=>{
     },260);
   }
 
-  function openEpisodeOne(){
+  function revealEpisode(episode){
+    const data = EPISODES[episode];
+
+    if(data.video){
+      if(window.location.protocol === "file:"){
+        localNote.classList.add("active");
+      }else{
+        youtubeShell.classList.add("active");
+        frame.src = data.video;
+      }
+    }else{
+      placeholderTitle.textContent = data.title;
+      placeholderText.textContent = "ACCESS GRANTED · VIDEO FILE COMING SOON";
+      runtimePlaceholder.classList.add("active");
+    }
+  }
+
+  function openRuntime(episode){
+    const data = EPISODES[episode];
     resetRuntime();
+
+    loaderFile.textContent = data.file;
+    runtimeEpisodeLabel.textContent = "EPISODE " + episodeNumber(episode);
+    runtimeSourceLabel.textContent = data.video ? "REMOTE VIDEO STREAM" : "ARCHIVE PLACEHOLDER";
+
     runtime.classList.add("active");
     runtime.setAttribute("aria-hidden","false");
-    timer=setInterval(()=>{
-      const stage=stages[step];
-      loaderFill.style.width=stage[0]+"%";
-      loaderPercent.textContent=stage[0]+"%";
-      loaderStatus.textContent=stage[1];
+
+    const stages = [
+      [12,"READING FLOPPY INDEX..."],
+      [28,"VERIFYING ACCESS HEADER..."],
+      [46,"MATCH FOUND..."],
+      [64,"MOUNTING FLOPPY..."],
+      [82,"READING " + data.file + "..."],
+      [100,"OPENING EPISODE FILE..."]
+    ];
+
+    let step = 0;
+    timer = setInterval(()=>{
+      const stage = stages[step];
+      loaderFill.style.width = stage[0] + "%";
+      loaderPercent.textContent = stage[0] + "%";
+      loaderStatus.textContent = stage[1];
       step++;
-      if(step>=stages.length){
+
+      if(step >= stages.length){
         clearInterval(timer);
         setTimeout(()=>{
           crtFlash.classList.add("go");
           setTimeout(()=>{
-            loader.style.display="none";
-            if(window.location.protocol==="file:"){
-              localNote.classList.add("active");
-            }else{
-              youtubeShell.classList.add("active");
-              frame.src="https://www.youtube-nocookie.com/embed/Sq9yKgY1V_w?autoplay=1&rel=0&modestbranding=1&playsinline=1";
-            }
+            loader.style.display = "none";
+            revealEpisode(episode);
           },420);
-        },340);
+        },300);
       }
     },360);
   }
 
-  function openPlaceholder(n){
-    const ep=EPISODES[n];
-    viewerTitle.textContent=ep.title;
-    video.innerHTML=`<div class="placeholder">
-      <span class="big-num">${String(n).padStart(2,"0")}</span>
-      <span class="ep-title">${ep.title}</span>
-      <span class="coming">ACCESS ACCEPTED · VIDEO COMING SOON</span>
-    </div>`;
-    viewer.classList.remove("hidden");
-  }
+  apps.forEach(app=>{
+    app.classList.add("is-locked");
 
-  document.querySelectorAll(".episode-app").forEach(app=>{
-    app.classList.add("locked-episode");
     app.addEventListener("click",event=>{
       event.preventDefault();
       event.stopImmediatePropagation();
-      openGate(app.dataset.episode);
+
+      const episode = app.dataset.episode;
+
+      if(unlockedThisVisit.has(episode)){
+        openRuntime(episode);
+      }else{
+        openGate(episode);
+      }
     },true);
   });
 
   form.addEventListener("submit",event=>{
     event.preventDefault();
-    const ep=EPISODES[selectedEpisode];
-    if(!ep.code){
-      message.textContent="ACCESS DENIED · NO VALID KEY HAS BEEN ISSUED YET";
-      message.className="";
+
+    const data = EPISODES[selectedEpisode];
+    const entered = normalize(input.value);
+    const required = normalize(data.code);
+
+    if(!required){
+      message.textContent =
+        "ACCESS DENIED\nNO VALID KEY HAS BEEN ISSUED FOR THIS FILE";
+      message.className = "";
       input.select();
       return;
     }
 
-    if(normalize(input.value)===ep.code){
-      message.textContent="ACCESS GRANTED · MOUNTING EPISODE "+String(selectedEpisode).padStart(2,"0");
-      message.className="success";
-      setTimeout(()=>{
-        closeGate();
-        if(selectedEpisode==="1")openEpisodeOne();
-        else openPlaceholder(selectedEpisode);
-      },700);
-    }else{
-      message.textContent="ACCESS DENIED · THAT KEY DOESN'T BELONG TO THIS FILE";
-      message.className="";
+    if(entered !== required){
+      message.textContent =
+        "ACCESS DENIED\nUNKNOWN ACCESS KEY";
+      message.className = "";
       input.select();
+      return;
     }
+
+    input.disabled = true;
+    message.className = "success";
+    message.textContent = "VERIFYING...";
+
+    verifyTimer = setTimeout(()=>{
+      message.textContent = "MATCH FOUND";
+      verifyTimer = setTimeout(()=>{
+        message.textContent =
+          "ACCESS GRANTED\nMOUNTING FLOPPY...";
+        unlockedThisVisit.add(selectedEpisode);
+
+        verifyTimer = setTimeout(()=>{
+          input.disabled = false;
+          const episodeToOpen = selectedEpisode;
+          closeGate();
+          openRuntime(episodeToOpen);
+        },650);
+      },500);
+    },500);
   });
 
-  cancel.addEventListener("click",closeGate);
+  cancel.addEventListener("click",()=>{
+    input.disabled = false;
+    closeGate();
+  });
+
   runtimeBack.addEventListener("click",closeRuntime);
 
   document.addEventListener("keydown",event=>{
-    if(event.key==="Escape"){
-      if(!gate.classList.contains("hidden"))closeGate();
-      else if(runtime.classList.contains("active"))closeRuntime();
+    if(event.key !== "Escape") return;
+
+    if(!gate.classList.contains("hidden")){
+      input.disabled = false;
+      closeGate();
+    }else if(runtime.classList.contains("active")){
+      closeRuntime();
     }
   });
 });
