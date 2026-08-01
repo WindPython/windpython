@@ -200,7 +200,7 @@ body{
               <span class="app-name">WP FLIGHT</span>
             </a>
 
-            <a class="app-link" href="nathaniel-chase.html" data-chase-launcher="true">
+            <a class="app-link" href="nathaniel-chase.html?v=20260801-1115" data-chase-launcher="true">
               <div class="app-icon image-icon chase-game-icon nathaniel-head-app-icon">
                 <img src="assets/images/nathaniel-chase/nathaniel.png" alt="">
               </div>
@@ -251,7 +251,7 @@ body{
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=20260801-1115"></script>
   <script src="cursor.js"></script>
 
 <audio id="chaseLauncherAudio" preload="auto" loop>
@@ -306,7 +306,7 @@ body{
       document.body.classList.add('chase-open');
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden', 'false');
-      frame.src = 'nathaniel-chase.html?embedded=1';
+      frame.src = 'nathaniel-chase.html?embedded=1&v=20260801-1115';
     });
   });
 
@@ -331,6 +331,7 @@ body{
 
 
 <script id="unlockClickReliabilityFix">
+// Fallback audio player; successful-unlock timing is controlled by script.js.
 (() => {
   const unlockAudio = document.getElementById("phoneUnlockClick");
   if (!unlockAudio) return;
@@ -365,20 +366,6 @@ body{
   });
 })();
 </script>
-
-
-<script id="unlockClickDelegatedFallback">
-document.addEventListener("pointerup", (event) => {
-  const target = event.target.closest(
-    '#unlockSlider, #slider, #slideHandle, .unlock-slider, .slide-to-unlock, .slider-handle, .unlock-handle'
-  );
-  if (target && window.playPhoneUnlockClick) {
-    window.playPhoneUnlockClick();
-  }
-});
-</script>
-
-
 <script id="chaseCursorRestoreGuard">
 window.addEventListener("pageshow", () => {
   const overlay = document.getElementById("chaseAppOverlay");
