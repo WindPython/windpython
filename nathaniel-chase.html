@@ -1302,6 +1302,27 @@ body{
   }
 </style>
 
+<style id="chaseMobileStableFix">
+@media(max-width:760px),(pointer:coarse){
+.mobile-controls{height:138px!important;min-height:138px!important;flex:0 0 138px!important;padding:4px 14px 2px!important;align-items:center!important}
+.dpad{position:relative!important;width:126px!important;height:126px!important;flex:0 0 126px!important;transform:none!important}
+.dpad::after{content:""!important;position:absolute!important;left:41px!important;top:41px!important;width:44px!important;height:44px!important;border-radius:6px!important;background:#201a24!important;pointer-events:none!important}
+.dpad button{position:absolute!important;width:44px!important;height:44px!important;margin:0!important;padding:0!important;line-height:44px!important;font-size:19px!important;border:0!important;border-radius:6px!important;background:#211b25!important;color:#eee8f2!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.08),0 4px 0 #0d0a0f!important;touch-action:none!important;user-select:none!important;transform:none!important}
+.dpad button:active{transform:translateY(2px)!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.05),0 2px 0 #0d0a0f!important}
+.dpad .up{left:41px!important;top:0!important}.dpad .down{left:41px!important;bottom:0!important}.dpad .left{left:0!important;top:41px!important}.dpad .right{right:0!important;top:41px!important}
+.console-buttons{min-width:112px!important;transform:none!important}}
+#endPanel{padding:8px!important;overflow:hidden!important}
+#endPanel .card{width:min(92%,330px)!important;max-width:330px!important;max-height:92%!important;padding:12px 14px!important;margin:0 auto!important;gap:0!important;overflow:hidden!important}
+#endTitle{margin:0!important;font-size:clamp(29px,8.4vw,43px)!important;line-height:.9!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important}
+#endSub{margin:6px 0 2px!important;font-size:clamp(22px,6.5vw,32px)!important;line-height:1!important}
+#endText{margin:3px 0 4px!important;font-size:clamp(11px,3vw,15px)!important;line-height:1.1!important}
+.win-heads{display:flex!important;justify-content:center!important;align-items:flex-end!important;gap:8px!important;width:100%!important;margin:3px auto 4px!important;overflow:visible!important}
+.win-head{display:block!important;width:auto!important;height:38px!important;max-width:42px!important;object-fit:contain!important;object-position:center bottom!important;flex:0 0 auto!important;border:0!important;background:transparent!important}
+.access-reward{width:100%!important;box-sizing:border-box!important;margin:5px auto!important;padding:6px 7px!important}
+.access-reward .reward-label{font-size:9px!important;line-height:1.05!important;letter-spacing:.7px!important}.access-reward .reward-code{margin:3px 0 2px!important;font-size:clamp(22px,6vw,30px)!important;line-height:1!important}.access-reward .reward-note{font-size:8px!important;line-height:1.1!important}
+#restartBtn{width:auto!important;min-width:150px!important;margin:4px auto 0!important;padding:8px 12px!important;font-size:14px!important}
+@media(max-height:680px){.win-head{height:31px!important}#endPanel .card{padding:9px 11px!important}.access-reward{margin:3px auto!important;padding:5px 6px!important}#restartBtn{padding:7px 10px!important}}
+</style>
 </head>
 <body>
 <div class="arcade-shell">
@@ -1770,6 +1791,13 @@ body{
       y:ent.prevY+(ent.y-ent.prevY)*progress
     };
   }
+  function renderEnemyPosition(ent){
+    const progress=Math.max(0,Math.min(1,enemyAccumulator/currentEnemyStepTime));
+    return {
+      x:ent.prevX+(ent.x-ent.prevX)*progress,
+      y:ent.prevY+(ent.y-ent.prevY)*progress
+    };
+  }
 
   function drawSprite(image,cx,cy,height,facing,bob=0,frightened=false){
     if(!(image.complete && image.naturalWidth)) return false;
@@ -1842,7 +1870,7 @@ body{
   }
 
   function drawEnemy(e,index){
-    const pos=renderPosition(e,enemyAccumulator,currentEnemyStepTime);
+    const pos=renderEnemyPosition(e);
     const cx=pos.x*TILE+16;
     const cy=pos.y*TILE+18;
     const frightened=powerTimer>0;
@@ -2060,130 +2088,3 @@ document.addEventListener("keydown", function(event){
 
 </body>
 </html>
-<style>
-  #startPanel.hidden,
-  #titlePanel.hidden,
-  #readyPanel.hidden,
-  #endPanel.hidden {
-    display: none !important;
-    pointer-events: none !important;
-  }
-  #titleStartButton {
-    position: relative;
-    z-index: 30;
-    pointer-events: auto;
-    cursor: pointer;
-  }
-
-  /* Mobile chase comfort patch */
-  @media(max-width:760px),(pointer:coarse){
-    .dpad{
-      width:154px !important;
-      height:154px !important;
-      flex-basis:154px !important;
-    }
-    .dpad button{
-      width:56px !important;
-      height:56px !important;
-      font-size:25px !important;
-      touch-action:none !important;
-      -webkit-user-select:none !important;
-      user-select:none !important;
-    }
-    .dpad .up{left:49px !important;top:0 !important}
-    .dpad .down{left:49px !important;bottom:0 !important}
-    .dpad .left{left:0 !important;top:49px !important}
-    .dpad .right{right:0 !important;top:49px !important}
-  }
-
-  #endPanel .card{
-    width:min(94%,390px) !important;
-    max-height:92% !important;
-    overflow-y:auto !important;
-    padding:clamp(15px,4vw,24px) !important;
-  }
-  #endTitle{
-    font-size:clamp(34px,11vw,58px) !important;
-    line-height:.92 !important;
-    white-space:nowrap !important;
-    word-break:normal !important;
-    overflow-wrap:normal !important;
-  }
-  #endSub{
-    font-size:clamp(27px,8vw,44px) !important;
-    margin:10px 0 6px !important;
-  }
-  #endText{
-    font-size:clamp(14px,3.7vw,18px) !important;
-    margin:7px 0 !important;
-  }
-  @media(max-width:430px){
-    .win-heads{gap:2px !important}
-    .win-head{
-      width:min(16vw,52px) !important;
-      height:min(24vw,80px) !important;
-    }
-  }
-
-  /* Compact victory layout: everything fits inside the phone without scrolling. */
-  #endPanel .card{
-    width:min(90%,350px) !important;
-    max-height:88% !important;
-    overflow:hidden !important;
-    padding:14px 16px 13px !important;
-  }
-  #endTitle{
-    font-size:clamp(31px,9vw,48px) !important;
-    line-height:.92 !important;
-    margin:0 !important;
-    white-space:nowrap !important;
-  }
-  #endSub{
-    font-size:clamp(24px,7vw,35px) !important;
-    margin:7px 0 2px !important;
-  }
-  #endText{
-    font-size:clamp(13px,3.5vw,17px) !important;
-    line-height:1.15 !important;
-    margin:4px 0 6px !important;
-  }
-  .win-heads{
-    display:flex !important;
-    justify-content:center !important;
-    align-items:flex-end !important;
-    gap:clamp(7px,2.2vw,13px) !important;
-    width:100% !important;
-    margin:4px auto 5px !important;
-  }
-  .win-head{
-    width:auto !important;
-    height:clamp(39px,11vw,55px) !important;
-    object-fit:contain !important;
-    object-position:center bottom !important;
-    flex:0 0 auto !important;
-  }
-  .access-reward{
-    width:100% !important;
-    box-sizing:border-box !important;
-    margin:6px auto 5px !important;
-    padding:7px 8px !important;
-  }
-  .access-reward .reward-label{
-    font-size:clamp(8px,2.1vw,11px) !important;
-    line-height:1.1 !important;
-    white-space:normal !important;
-  }
-  .access-reward .reward-code{
-    margin:4px 0 2px !important;
-    font-size:clamp(23px,6.8vw,34px) !important;
-    line-height:1 !important;
-  }
-  .access-reward .reward-note{
-    font-size:clamp(8px,2.15vw,11px) !important;
-    line-height:1.15 !important;
-  }
-  #endPanel .btn{
-    margin-top:4px !important;
-    padding:8px 12px !important;
-  }
-</style>

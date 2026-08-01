@@ -1,4 +1,16 @@
 const unlockSound=new Audio("assets/audio/unlockphone.mp3");
+unlockSound.preload="auto";
+unlockSound.playsInline=true;
+let phoneUnlocked=false;
+function playUnlockSound(){
+  try{
+    unlockSound.pause();
+    unlockSound.currentTime=0;
+    unlockSound.volume=1;
+    const attempt=unlockSound.play();
+    if(attempt && typeof attempt.catch==="function") attempt.catch(()=>{});
+  }catch(_){}
+}
 const lockScreen = document.getElementById("lockScreen");
 const homeScreen = document.getElementById("homeScreen");
 const unlockTrack = document.getElementById("unlockTrack");
@@ -56,8 +68,7 @@ function beginDrag(clientX) {
 
 function moveDrag(clientX) {
   if (!dragging) return;
-  const ratio = setHandle(startLeft + (clientX - startX));
-  if (ratio >= 0.93) unlockPhone();
+  setHandle(startLeft + (clientX - startX));
 }
 
 function endDrag() {
@@ -65,21 +76,25 @@ function endDrag() {
   dragging = false;
   const left = parseFloat(getComputedStyle(unlockHandle).left) || 4;
   const ratio = left / getMaxLeft();
-
-  if (ratio < 0.93) {
-    unlockHandle.style.transition = "left .2s ease";
-    unlockFill.style.transition = "width .2s ease";
-    setHandle(4);
-    setTimeout(() => {
-      unlockHandle.style.transition = "";
-      unlockFill.style.transition = "";
-    }, 220);
+  if (ratio >= 0.93) {
+    playUnlockSound();
+    unlockPhone(false);
+    return;
   }
+  unlockHandle.style.transition = "left .2s ease";
+  unlockFill.style.transition = "width .2s ease";
+  setHandle(4);
+  setTimeout(() => {
+    unlockHandle.style.transition = "";
+    unlockFill.style.transition = "";
+  }, 220);
 }
 
-function unlockPhone() {
-  try{unlockSound.currentTime=0;unlockSound.play();}catch(e){}
-  dragging = false;
+function unlockPhone(playSound=true) {
+  if(phoneUnlocked) return;
+  phoneUnlocked=true;
+  if(playSound) playUnlockSound();
+  dragging=false;
   lockScreen.classList.add("unlocking");
   setTimeout(() => {
     lockScreen.classList.add("hidden");
@@ -97,5 +112,8 @@ unlockHandle.addEventListener("pointerup", endDrag);
 unlockHandle.addEventListener("pointercancel", endDrag);
 
 unlockHandle.addEventListener("click", () => {
-  if (!dragging) unlockPhone();
+  if (!dragging && !phoneUnlocked) {
+    playUnlockSound();
+    unlockPhone(false);
+  }
 });
