@@ -37,48 +37,65 @@
       pointer-events: none;
     }
     .game-title {
-      position: absolute;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: white;
-      text-shadow: 0 3px 0 rgba(0,0,0,.22);
-      font-size: clamp(18px, 2.2vw, 34px);
-      font-weight: 900;
-      letter-spacing: .08em;
-      white-space: nowrap;
+      position:absolute;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%) skew(-6deg);
+      padding:8px 18px 7px;
+      color:#ffe46b;
+      background:linear-gradient(180deg,#2b1738,#110a17);
+      border:3px solid #92e8ff;
+      border-radius:10px;
+      box-shadow:5px 5px 0 rgba(0,0,0,.45);
+      text-shadow:3px 3px 0 #b63d79;
+      font:900 clamp(18px,2.5vw,36px)/1 "Courier New",monospace;
+      letter-spacing:.08em;
+      white-space:nowrap;
     }
     .score {
-      position: absolute;
-      top: 24px;
-      right: 28px;
-      color: #fff;
-      font-weight: 900;
-      font-size: clamp(22px, 3vw, 44px);
-      text-shadow: 0 3px 0 rgba(0,0,0,.25);
+      position:absolute;
+      top:20px;
+      right:24px;
+      min-width:58px;
+      padding:6px 10px;
+      color:#ffe46b;
+      background:rgba(12,8,18,.78);
+      border:2px solid #ff9ec8;
+      border-radius:9px;
+      text-align:center;
+      font:900 clamp(20px,3vw,42px)/1 "Courier New",monospace;
+      text-shadow:2px 2px 0 #000;
     }
     .game-message {
-      position: absolute;
-      z-index: 40;
-      left: 50%;
-      top: 54%;
-      transform: translate(-50%,-50%);
-      width: min(460px, 78%);
-      padding: 22px;
-      border-radius: 24px;
-      background: rgba(255,255,255,.88);
-      border: 3px solid rgba(0,0,0,.15);
-      text-align: center;
-      color: #222;
-      pointer-events: auto;
-      box-shadow: 0 12px 26px rgba(0,0,0,.18);
+      position:absolute;
+      z-index:40;
+      left:50%;
+      top:54%;
+      transform:translate(-50%,-50%);
+      width:min(430px,82%);
+      padding:20px 22px;
+      border-radius:16px;
+      background:linear-gradient(145deg,#21122b,#0d0812 80%);
+      border:3px solid #8c69a2;
+      outline:3px solid #65e6ff;
+      outline-offset:-8px;
+      text-align:center;
+      color:#fff;
+      pointer-events:auto;
+      box-shadow:8px 8px 0 rgba(0,0,0,.55);
+      font-family:"Courier New",monospace;
     }
     .game-message h1 {
-      margin: 0 0 8px;
-      font-size: clamp(24px, 4vw, 44px);
+      margin:0 0 8px;
+      color:#ff63b6;
+      text-shadow:3px 3px 0 #000;
+      font:900 clamp(26px,4.5vw,46px)/.95 "Courier New",monospace;
+      text-transform:uppercase;
     }
     .game-message p {
-      margin: 5px 0;
+      margin:6px 0;
+      color:#fff;
+      font-weight:700;
     }
     .game-message button {
       margin-top: 14px;
@@ -92,7 +109,117 @@
       
     }
     .hidden { display:none; }
-  </style>
+  
+    #secretToast{
+      position:absolute;
+      z-index:70;
+      left:50%;
+      top:22%;
+      transform:translate(-50%,-14px);
+      width:min(430px,78%);
+      padding:13px 18px;
+      border:3px solid #92e8ff;
+      border-radius:12px;
+      background:rgba(11,7,16,.94);
+      color:#fff;
+      text-align:center;
+      font:900 clamp(12px,1.8vw,18px) "Courier New",monospace;
+      box-shadow:5px 5px 0 rgba(0,0,0,.45);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .25s ease,transform .25s ease;
+    }
+    #secretToast.show{
+      opacity:1;
+      transform:translate(-50%,0);
+    }
+    #secretToast strong{
+      display:block;
+      margin-bottom:4px;
+      color:#ffe46b;
+      font-size:1.15em;
+      letter-spacing:1px;
+    }
+
+    .game-over-reward{
+      margin:12px auto 2px;
+      padding:10px 12px;
+      border:2px solid #92e8ff;
+      border-radius:10px;
+      background:#100a16;
+      color:#fff;
+      font-family:"Courier New",monospace;
+    }
+    .game-over-reward.hidden{display:none}
+    .game-over-reward small{
+      display:block;
+      color:#92e8ff;
+      font-weight:900;
+      letter-spacing:1px;
+    }
+    .game-over-reward strong{
+      display:block;
+      margin-top:5px;
+      color:#ffe46b;
+      font-size:clamp(22px,4vw,38px);
+      letter-spacing:2px;
+    }
+
+
+    #gameOverPanel{
+      z-index:100 !important;
+      pointer-events:auto !important;
+    }
+    #gameOverPanel button,
+    #gameOverPanel a{
+      pointer-events:auto !important;
+      position:relative;
+      z-index:2;
+    }
+    .game-over-actions{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .game-over-actions a{
+      display:inline-block;
+      padding:12px 20px;
+      border-radius:999px;
+      background:#2b1738;
+      color:#fff;
+      border:2px solid #92e8ff;
+      text-decoration:none;
+      font-weight:900;
+    }
+
+
+    #gameOverPanel{
+      width:min(390px,84%)!important;
+      padding:18px 20px!important;
+    }
+    #gameOverPanel .game-over-actions{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    #gameOverPanel .game-over-actions a{
+      margin-top:10px;
+      padding:10px 16px;
+      border:2px solid #65e6ff;
+      border-radius:10px;
+      background:#2b1738;
+      color:#fff;
+      font:900 13px "Courier New",monospace;
+      text-decoration:none;
+      box-shadow:4px 4px 0 #000;
+    }
+
+</style>
 
 <style id="global-tabletop-continuity">
 html,body{min-height:100%;}
@@ -123,180 +250,13 @@ body{
 </style>
 
 
-<style id="flightEpisodeRewardStyles">
-  #rewardPanel{
-    position:absolute;inset:0;z-index:90;display:grid;place-items:center;
-    padding:24px;background:rgba(7,5,12,.82);backdrop-filter:blur(3px);
-  }
-  #rewardPanel.hidden{display:none}
-  .reward-card{
-    width:min(560px,88%);padding:24px 28px;border:3px solid #92e8ff;border-radius:18px;
-    background:linear-gradient(145deg,#17131f,#08070c 78%);
-    box-shadow:0 0 0 5px rgba(0,0,0,.45),0 0 34px rgba(146,232,255,.22);
-    color:white;text-align:center;font-family:"Courier New",monospace;
-  }
-  .reward-kicker{color:#92e8ff;font-weight:900;letter-spacing:2px;font-size:clamp(13px,2vw,20px)}
-  .reward-card h1{margin:9px 0 8px;font-size:clamp(28px,5vw,52px);line-height:.95}
-  .reward-card p{margin:8px 0;font-weight:700;font-size:clamp(13px,1.8vw,19px)}
-  .reward-file{margin:16px auto 10px;color:#ff9ec8;font-weight:900;letter-spacing:2px}
-  .reward-code{
-    margin:10px auto 14px;padding:13px 18px;width:min(390px,100%);
-    border:2px dashed #ffe46b;border-radius:10px;background:#08070b;
-    color:#ffe46b;font-size:clamp(25px,5vw,48px);font-weight:900;
-    letter-spacing:2px;overflow-wrap:anywhere;
-  }
-  .reward-card button{
-    margin-top:10px;padding:11px 18px;border:2px solid #fff;border-radius:9px;
-    background:#ef5f9a;color:#fff;font:900 15px "Courier New",monospace;
-    box-shadow:4px 4px 0 #111;cursor:none;
-  }
-  @media(max-height:520px){
-    .reward-card{padding:14px 20px}
-    .reward-card h1{font-size:28px}
-    .reward-code{font-size:25px;padding:8px 12px;margin:7px auto}
-    .reward-card p{margin:4px 0}
-  }
-</style>
 
 
-<style id="flightRewardV74Polish">
-  #rewardPanel{
-    padding:clamp(8px,2vw,18px) !important;
-    overflow:hidden !important;
-  }
-
-  .reward-card{
-    width:min(560px,92%) !important;
-    max-height:92% !important;
-    padding:clamp(12px,2.1vw,22px) clamp(16px,2.5vw,26px) !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:clamp(5px,1vw,10px) !important;
-    overflow:hidden !important;
-    box-sizing:border-box !important;
-  }
-
-  .reward-kicker{
-    font-size:clamp(11px,1.7vw,18px) !important;
-    margin:0 !important;
-  }
-
-  .reward-card h1{
-    margin:0 !important;
-    font-size:clamp(24px,4.5vw,46px) !important;
-    line-height:.92 !important;
-  }
-
-  .reward-card p{
-    margin:0 !important;
-    font-size:clamp(11px,1.6vw,17px) !important;
-    line-height:1.2 !important;
-  }
-
-  .reward-file{
-    margin:4px auto 0 !important;
-    font-size:clamp(11px,1.5vw,16px) !important;
-  }
-
-  .reward-code{
-    margin:3px auto 4px !important;
-    padding:clamp(8px,1.5vw,13px) clamp(12px,2vw,18px) !important;
-    width:min(390px,94%) !important;
-    font-size:clamp(22px,4.5vw,42px) !important;
-    line-height:1 !important;
-  }
-
-  .reward-card button{
-    margin-top:4px !important;
-    padding:clamp(8px,1.2vw,11px) clamp(14px,2vw,18px) !important;
-    font-size:clamp(11px,1.5vw,15px) !important;
-    flex:0 0 auto !important;
-  }
-
-  #rewardProgress{
-    width:min(390px,92%);
-    margin:5px auto 1px;
-    display:grid;
-    gap:5px;
-  }
-
-  .reward-progress-track{
-    width:100%;
-    height:12px;
-    border:1px solid rgba(255,255,255,.35);
-    border-radius:999px;
-    overflow:hidden;
-    background:#050507;
-  }
-
-  .reward-progress-fill{
-    width:0%;
-    height:100%;
-    background:linear-gradient(90deg,#92e8ff,#ff9ec8);
-    transition:width .28s steps(4,end);
-  }
-
-  #rewardStatus{
-    min-height:18px;
-    color:#92e8ff;
-    font:900 clamp(9px,1.2vw,13px) "Courier New",monospace;
-    letter-spacing:1px;
-  }
-
-  #rewardSecret{
-    width:100%;
-    display:none;
-  }
-
-  #rewardSecret.revealed{
-    display:block;
-    animation:rewardReveal .28s ease both;
-  }
-
-  @keyframes rewardReveal{
-    from{opacity:0;transform:scale(.96)}
-    to{opacity:1;transform:scale(1)}
-  }
-
-  @media(max-height:520px){
-    .reward-card{
-      width:min(620px,94%) !important;
-      max-height:94% !important;
-      padding:9px 16px !important;
-      gap:3px !important;
-    }
-    .reward-card h1{font-size:26px !important}
-    .reward-code{font-size:25px !important;padding:6px 10px !important}
-    .reward-card p{font-size:11px !important}
-    #rewardProgress{margin:2px auto 0}
-  }
-</style>
 
 
-<style id="rewardButtonPointerFix">
-  #rewardPanel,
-  #rewardPanel .reward-card,
-  #rewardPanel #rewardSecret,
-  #rewardPanel a,
-  #rewardPanel button {
-    pointer-events:auto !important;
-  }
-  #rewardReturn {
-    display:inline-block;
-    margin-top:4px;
-    padding:clamp(8px,1.2vw,11px) clamp(14px,2vw,18px);
-    border:2px solid #fff;
-    border-radius:9px;
-    background:#ef5f9a;
-    color:#fff;
-    font:900 clamp(11px,1.5vw,15px) "Courier New",monospace;
-    box-shadow:4px 4px 0 #111;
-    text-decoration:none;
-    cursor:none;
-  }
-</style>
+
+
+
 </head>
 <body class="landscape-page">
   <div class="landscape-phone">
@@ -306,39 +266,28 @@ body{
       <div class="game-ui">
         <div class="game-title">WIND PYTHON FLIGHT</div>
         <div class="score" id="score">0</div>
+        <div id="secretToast" aria-live="polite">
+          <strong>SECRET UNLOCKED</strong>
+          Episode 01 access key recovered. Keep flying.
+        </div>
         <section class="game-message" id="startPanel">
           <h1>Ready to fly?</h1>
           <p>Tap, click, or press the spacebar to rise.</p>
           <p>Fly through the gaps without crashing.</p>
           <button id="startButton" type="button">Start flight</button>
         </section>
-        
-<section id="rewardPanel" class="hidden" aria-hidden="true">
-  <div class="reward-card">
-    <div class="reward-kicker">MISSION COMPLETE</div>
-    <h1>NEW FILE RECOVERED</h1>
-    <p>Ten obstacles cleared.</p>
-
-    <div id="rewardProgress">
-      <div class="reward-progress-track">
-        <div id="rewardProgressFill" class="reward-progress-fill"></div>
-      </div>
-      <div id="rewardStatus">RECOVERING SYSTEM FILE...</div>
-    </div>
-
-    <div id="rewardSecret">
-      <div class="reward-file">EPISODE 01 ACCESS KEY</div>
-      <div class="reward-code">GINGER PUBES</div>
-      <p>Enter this password inside the Episodes app.</p>
-      <a id="rewardReturn" href="index.html">RETURN TO PHONE</a>
-    </div>
-  </div>
-</section>
-        <section class="game-message hidden" id="gameOverPanel">
+<section class="game-message hidden" id="gameOverPanel">
           <h1>Flight over</h1>
           <p>Score: <strong id="finalScore">0</strong></p>
           <p>Best: <strong id="bestScore">0</strong></p>
-          <button id="restartButton" type="button">Fly again</button>
+          <div class="game-over-reward hidden" id="gameOverReward">
+            <small>EPISODE 01 ACCESS KEY</small>
+            <strong>GINGER PUBES</strong>
+          </div>
+          <div class="game-over-actions">
+            <button id="restartButton" type="button">Fly again</button>
+            <a href="index.html">Return to phone</a>
+          </div>
         </section>
       </div>
     </div>
@@ -357,17 +306,16 @@ body{
     const bestScoreEl = document.getElementById('bestScore');
     const startButton = document.getElementById('startButton');
     const restartButton = document.getElementById('restartButton');
-    const rewardPanel = document.getElementById('rewardPanel');
-    const rewardProgressFill = document.getElementById('rewardProgressFill');
-    const rewardStatus = document.getElementById('rewardStatus');
-    const rewardSecret = document.getElementById('rewardSecret');
+    const secretToast = document.getElementById('secretToast');
+    const gameOverReward = document.getElementById('gameOverReward');
     let rewardEarnedThisRun = false;
-    let rewardSequenceTimer = null;
+    let toastTimer = null;
 
     const themeMusic = new Audio('flight-theme.mp3');
     themeMusic.loop = true;
     themeMusic.volume = 0.48;
     themeMusic.preload = 'auto';
+    themeMusic.load();
 
     const flapSound = new Audio('flight-flap.mp3');
     flapSound.volume = 0.78;
@@ -378,10 +326,11 @@ body{
     deathSound.preload = 'auto';
 
     function startThemeMusic() {
-      if (themeMusic.paused) {
+      try {
+        themeMusic.pause();
         themeMusic.currentTime = 0;
         themeMusic.play().catch(() => {});
-      }
+      } catch (_) {}
     }
 
     function stopThemeMusic() {
@@ -403,6 +352,9 @@ body{
     const flyer = new Image();
     flyer.src = 'assets/images/wind-python-fly-cropped.png';
 
+    const obstacleImage = new Image();
+    obstacleImage.src = 'wp-flight-obstacle.png';
+
     const spriteAnim = {
       frame: 0,
       elapsed: 0,
@@ -422,6 +374,8 @@ body{
     let score = 0;
     let best = 0;
     let pipes = [];
+    let obstacleSpeed = 3.9;
+    let spawnInterval = 105;
 
     const player = {
       x: 175,
@@ -437,10 +391,10 @@ body{
     // Tight collision rectangle covering the central visible body.
     // The large wings and tip are intentionally forgiving.
     const collider = {
-      left: 0.18,
-      right: 0.10,
-      top: 0.18,
-      bottom: 0.16
+      left: 0.40,
+      right: 0.36,
+      top: 0.36,
+      bottom: 0.34
     };
 
     function resetGame() {
@@ -456,14 +410,12 @@ body{
       scoreEl.textContent = '0';
       startPanel.classList.add('hidden');
       gameOverPanel.classList.add('hidden');
-      rewardPanel.classList.add('hidden');
-      rewardPanel.setAttribute('aria-hidden','true');
-      rewardProgressFill.style.width = '0%';
-      rewardStatus.textContent = 'RECOVERING SYSTEM FILE...';
-      rewardSecret.classList.remove('revealed');
-      clearTimeout(rewardSequenceTimer);
+      secretToast.classList.remove('show');
+      gameOverReward.classList.add('hidden');
+      clearTimeout(toastTimer);
       rewardEarnedThisRun = false;
-      startThemeMusic();
+      obstacleSpeed = 3.9;
+      spawnInterval = 105;
     }
 
     function flap() {
@@ -478,10 +430,12 @@ body{
       const top = margin + Math.random() * (canvas.height - gap - margin * 2);
       pipes.push({
         x: canvas.width + 30,
-        w: 86,
+        w: 136,
         top,
+        baseTop: top,
         gap,
-        passed: false
+        passed: false,
+        phase: Math.random() * Math.PI * 2
       });
     }
 
@@ -498,46 +452,17 @@ body{
     }
 
 
-    function completeFlightMission() {
+    function showSecretToast() {
       if (rewardEarnedThisRun) return;
       rewardEarnedThisRun = true;
-      running = false;
-      gameOver = true;
-      stopThemeMusic();
-      best = Math.max(best, score);
 
       try { localStorage.setItem('wpFlightCodeDiscovered', 'true'); } catch (e) {}
 
-      rewardProgressFill.style.width = '0%';
-      rewardStatus.textContent = 'RECOVERING SYSTEM FILE...';
-      rewardSecret.classList.remove('revealed');
-      rewardPanel.classList.remove('hidden');
-      rewardPanel.setAttribute('aria-hidden','false');
-
-      const stages = [
-        [18, 'RECOVERING SYSTEM FILE...'],
-        [43, 'VERIFYING ARCHIVE...'],
-        [72, 'DECRYPTING ACCESS KEY...'],
-        [100, 'ACCESS KEY FOUND']
-      ];
-
-      let index = 0;
-      const advance = () => {
-        const [percent, text] = stages[index];
-        rewardProgressFill.style.width = percent + '%';
-        rewardStatus.textContent = text;
-        index += 1;
-
-        if (index < stages.length) {
-          rewardSequenceTimer = setTimeout(advance, 420);
-        } else {
-          rewardSequenceTimer = setTimeout(() => {
-            rewardSecret.classList.add('revealed');
-          }, 320);
-        }
-      };
-
-      rewardSequenceTimer = setTimeout(advance, 160);
+      secretToast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        secretToast.classList.remove('show');
+      }, 2200);
     }
 
     function endGame() {
@@ -549,6 +474,8 @@ body{
       best = Math.max(best, score);
       finalScoreEl.textContent = score;
       bestScoreEl.textContent = best;
+      if (gameOverReward) gameOverReward.classList.toggle('hidden', !rewardEarnedThisRun);
+      secretToast.classList.remove('show');
       gameOverPanel.classList.remove('hidden');
     }
 
@@ -573,19 +500,55 @@ body{
       ctx.fillRect(0, canvas.height - 70, canvas.width, 8);
     }
 
+    function drawObstacleSegment(x, y, width, height, flipVertical=false) {
+      if (!(obstacleImage.complete && obstacleImage.naturalWidth)) {
+        ctx.fillStyle = '#ef5f9a';
+        ctx.fillRect(x, y, width, height);
+        return;
+      }
+
+      const sw = obstacleImage.naturalWidth;
+      const sh = obstacleImage.naturalHeight;
+      const headSourceHeight = Math.round(sh * 0.28);
+      const bodySourceY = headSourceHeight;
+      const bodySourceHeight = Math.max(1, sh - bodySourceY);
+      const headDrawHeight = Math.min(height, Math.max(48, width * 0.72));
+      const bodyDrawHeight = Math.max(0, height - headDrawHeight);
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+
+      if (flipVertical) {
+        ctx.translate(x, y + height);
+        ctx.scale(1, -1);
+        x = 0;
+        y = 0;
+      }
+
+      if (bodyDrawHeight > 0) {
+        ctx.drawImage(
+          obstacleImage,
+          0, bodySourceY, sw, bodySourceHeight,
+          x, y + headDrawHeight, width, bodyDrawHeight
+        );
+      }
+
+      ctx.drawImage(
+        obstacleImage,
+        0, 0, sw, headSourceHeight,
+        x, y, width, headDrawHeight
+      );
+
+      ctx.restore();
+    }
+
     function drawPipe(pipe) {
-      const grad = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.w, 0);
-      grad.addColorStop(0, '#f7a8cc');
-      grad.addColorStop(.5, '#ef5f9a');
-      grad.addColorStop(1, '#c83d77');
-      ctx.fillStyle = grad;
+      const topHeight = Math.max(8, pipe.top);
+      const bottomY = pipe.top + pipe.gap;
+      const bottomHeight = Math.max(8, canvas.height - bottomY - 70);
 
-      ctx.fillRect(pipe.x, 0, pipe.w, pipe.top);
-      ctx.fillRect(pipe.x, pipe.top + pipe.gap, pipe.w, canvas.height - (pipe.top + pipe.gap) - 70);
-
-      ctx.fillStyle = '#fff0a9';
-      ctx.fillRect(pipe.x - 8, pipe.top - 20, pipe.w + 16, 20);
-      ctx.fillRect(pipe.x - 8, pipe.top + pipe.gap, pipe.w + 16, 20);
+      drawObstacleSegment(pipe.x, 0, pipe.w, topHeight, true);
+      drawObstacleSegment(pipe.x, bottomY, pipe.w, bottomHeight, false);
     }
 
     function drawPlayer() {
@@ -632,24 +595,51 @@ body{
       player.vy += player.gravity;
       player.y += player.vy;
 
-      if (frame % 105 === 0) addPipe();
+      if (frame % Math.max(72, Math.round(spawnInterval)) === 0) addPipe();
 
       for (const pipe of pipes) {
-        pipe.x -= 3.9;
+        pipe.x -= obstacleSpeed;
+
+        if (score >= 15) {
+          const bob = Math.sin(frame * 0.035 + pipe.phase) * 8;
+          pipe.top = pipe.baseTop + bob;
+        } else {
+          pipe.top = pipe.baseTop;
+        }
 
         if (!pipe.passed && pipe.x + pipe.w < player.x) {
           pipe.passed = true;
           score++;
           scoreEl.textContent = score;
-          if (score >= 10) {
-            completeFlightMission();
-            return;
+
+          if (score === 10) {
+            showSecretToast();
+          }
+
+          if (score > 0 && score % 10 === 0) {
+            const tier = Math.min(5, Math.floor(score / 10));
+            obstacleSpeed = 3.9 * (1 + tier * 0.07);
+            spawnInterval = 105 * (1 - Math.min(0.22, tier * 0.04));
           }
         }
 
-        const hitTop = intersects(player.x, player.y, player.w, player.h, pipe.x, 0, pipe.w, pipe.top);
+        const collisionInset = Math.round(pipe.w * 0.34);
+        const collisionX = pipe.x + collisionInset;
+        const collisionW = Math.max(18, pipe.w - collisionInset * 2);
+        const edgeGrace = 18;
+
+        const hitTop = intersects(
+          player.x, player.y, player.w, player.h,
+          collisionX, 0, collisionW, Math.max(0, pipe.top - edgeGrace)
+        );
+
         const bottomY = pipe.top + pipe.gap;
-        const hitBottom = intersects(player.x, player.y, player.w, player.h, pipe.x, bottomY, pipe.w, canvas.height - bottomY - 70);
+        const safeBottomY = bottomY + edgeGrace;
+        const hitBottom = intersects(
+          player.x, player.y, player.w, player.h,
+          collisionX, safeBottomY, collisionW,
+          Math.max(0, canvas.height - safeBottomY - 70)
+        );
         if (hitTop || hitBottom) endGame();
       }
 
@@ -705,13 +695,18 @@ body{
       }
     });
     startButton.addEventListener('click', () => {
+      startThemeMusic();
       resetGame();
       flap();
     });
 
-    restartButton.addEventListener('click', () => {
+    restartButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      gameOverPanel.classList.add('hidden');
+      startThemeMusic();
       resetGame();
-      flap();
+      requestAnimationFrame(() => flap());
     });
 
 

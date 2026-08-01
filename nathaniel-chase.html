@@ -495,47 +495,13 @@
   const gameMusic = new Audio("assets/audio/nathaniel-game-music.mp3");
   gameMusic.preload = "auto";
   gameMusic.loop = true;
-  gameMusic.volume = 0.08;
+  gameMusic.volume = 0.14;
 
-  let gameMusicContext = null;
-  let gameMusicSource = null;
-  let gameMusicGain = null;
-
-  function prepareGameMusicVolume(){
+  function startGameMusic(){
     try{
-      if(!gameMusicContext){
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if(!AudioContextClass) return;
-
-        gameMusicContext = new AudioContextClass();
-        gameMusicSource = gameMusicContext.createMediaElementSource(gameMusic);
-        gameMusicGain = gameMusicContext.createGain();
-
-        const isMobileAudio =
-          window.matchMedia("(pointer:coarse)").matches ||
-          window.matchMedia("(max-width:760px)").matches;
-
-        // Mobile remains at 8%. Desktop is 15% louder at 9.2%.
-        gameMusicGain.gain.value = isMobileAudio ? 0.08 : 0.132;
-
-        gameMusicSource.connect(gameMusicGain);
-        gameMusicGain.connect(gameMusicContext.destination);
-      }
-
-      if(gameMusicContext.state === "suspended"){
-        gameMusicContext.resume().catch(()=>{});
-      }
-
-      if(gameMusicGain){
-        const isMobileAudio =
-          window.matchMedia("(pointer:coarse)").matches ||
-          window.matchMedia("(max-width:760px)").matches;
-
-        gameMusicGain.gain.setValueAtTime(
-          isMobileAudio ? 0.08 : 0.132,
-          gameMusicContext.currentTime
-        );
-      }
+      gameMusic.pause();
+      gameMusic.currentTime = 0;
+      gameMusic.play().catch(()=>{});
     }catch(_){}
   }
 
@@ -1024,7 +990,7 @@
   }
 
   function start(){
-    prepareGameMusicVolume();
+    startGameMusic();
     stopParentChaseMusic();
     pausedByUser=false;
     pauseBtn.textContent="PAUSE";
@@ -1201,7 +1167,7 @@
       gameMusic.pause();
       runSound.pause();
     }else if(endPanel.classList.contains("hidden") && victoryVhs.classList.contains("hidden")){
-      prepareGameMusicVolume();
+      startGameMusic();
       lastTime=performance.now();
       gameMusic.play().catch(()=>{});
     }
@@ -1209,7 +1175,6 @@
 
   titleStartButton.addEventListener("click",()=>{
     stopParentChaseMusic();
-    prepareGameMusicVolume();
     stopTitleLoop();
     titlePanel.classList.add("hidden");
     startPanel.classList.add("hidden");
