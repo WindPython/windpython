@@ -219,6 +219,16 @@
       box-shadow:4px 4px 0 #000;
     }
 
+
+#wpCameo{
+  position:absolute;right:-190px;bottom:18px;z-index:95;
+  width:clamp(110px,18vw,180px);pointer-events:none;opacity:0;
+  transform:translateY(24px) scale(.96);
+  transition:right .20s cubic-bezier(.2,.95,.25,1.18),opacity .12s linear,transform .20s cubic-bezier(.2,.95,.25,1.18);
+  filter:drop-shadow(6px 6px 0 rgba(0,0,0,.45));image-rendering:pixelated;
+}
+#wpCameo.show{right:-8px;opacity:1;transform:translateY(0) scale(1)}
+#wpCameo.bounce{transform:translateY(-5px) scale(1.02)}
 </style>
 
 <style id="global-tabletop-continuity">
@@ -270,6 +280,7 @@ body{
           <strong>SECRET UNLOCKED</strong>
           Episode 01 access key recovered. Keep flying.
         </div>
+        <img id="wpCameo" src="wp-flight-cameo-head.png" alt="">
         <section class="game-message" id="startPanel">
           <h1>Ready to fly?</h1>
           <p>Tap, click, or press the spacebar to rise.</p>
@@ -308,8 +319,14 @@ body{
     const restartButton = document.getElementById('restartButton');
     const secretToast = document.getElementById('secretToast');
     const gameOverReward = document.getElementById('gameOverReward');
+    const wpCameo = document.getElementById('wpCameo');
+    const wpCameoSound = new Audio('wp-flight-cameo.mp3');
+    wpCameoSound.preload = 'auto';
+    wpCameoSound.volume = 0.95;
     let rewardEarnedThisRun = false;
     let toastTimer = null;
+    let cameoShownThisRun = false;
+    let cameoTimers = [];
 
     const themeMusic = new Audio('flight-theme.mp3');
     themeMusic.loop = true;
@@ -355,6 +372,9 @@ body{
     const obstacleImage = new Image();
     obstacleImage.src = 'wp-flight-obstacle.png';
 
+    const ufoImage = new Image();
+    ufoImage.src = 'wp-flight-ufo.png';
+
     const spriteAnim = {
       frame: 0,
       elapsed: 0,
@@ -376,6 +396,11 @@ body{
     let pipes = [];
     let obstacleSpeed = 3.9;
     let spawnInterval = 105;
+    let ufoShownThisRun = false;
+    let ufoActive = false;
+    let ufoProgress = 0;
+    let deathAnimating = false;
+    let deathTimer = null;
 
     const player = {
       x: 175,
@@ -385,7 +410,9 @@ body{
       vy: 0,
       gravity: 0.38,
       flap: -6.8,
-      rotation: 0
+      rotation: 0,
+      deathVy: 0,
+      deathRotation: 0
     };
 
     // Tight collision rectangle covering the central visible body.
@@ -397,9 +424,39 @@ body{
       bottom: 0.34
     };
 
+    function clearCameoTimers(){
+      cameoTimers.forEach(clearTimeout);
+      cameoTimers=[];
+    }
+
+    function hideWpCameo(){
+      clearCameoTimers();
+      wpCameo.classList.remove('show','bounce');
+      wpCameoSound.pause();
+      wpCameoSound.currentTime=0;
+    }
+
+    function triggerWpCameo(){
+      if(cameoShownThisRun) return;
+      cameoShownThisRun=true;
+      clearCameoTimers();
+      wpCameoSound.pause();
+      wpCameoSound.currentTime=0;
+      wpCameo.classList.remove('bounce');
+      wpCameo.classList.add('show');
+      wpCameoSound.play().catch(()=>{});
+      cameoTimers.push(setTimeout(()=>wpCameo.classList.add('bounce'),220));
+      cameoTimers.push(setTimeout(()=>wpCameo.classList.remove('bounce'),360));
+      cameoTimers.push(setTimeout(()=>wpCameo.classList.remove('show','bounce'),900));
+    }
+
     function resetGame() {
       player.y = canvas.height / 2 - 40;
       player.vy = 0;
+      player.deathVy = 0;
+      player.deathRotation = 0;
+      deathAnimating = false;
+      clearTimeout(deathTimer);
       spriteAnim.frame = 0;
       spriteAnim.elapsed = 0;
       pipes = [];
@@ -414,12 +471,17 @@ body{
       gameOverReward.classList.add('hidden');
       clearTimeout(toastTimer);
       rewardEarnedThisRun = false;
+      cameoShownThisRun = false;
+      hideWpCameo();
+      ufoShownThisRun = false;
+      ufoActive = false;
+      ufoProgress = 0;
       obstacleSpeed = 3.9;
       spawnInterval = 105;
     }
 
     function flap() {
-      if (!running) return;
+      if (!running || deathAnimating) return;
       player.vy = player.flap;
       playFlapSound();
     }
@@ -466,36 +528,176 @@ body{
     }
 
     function endGame() {
-      if (gameOver) return;
+      if (gameOver || deathAnimating) return;
+
       running = false;
-      gameOver = true;
+      deathAnimating = true;
       stopThemeMusic();
       playDeathSound();
-      best = Math.max(best, score);
-      finalScoreEl.textContent = score;
-      bestScoreEl.textContent = best;
-      if (gameOverReward) gameOverReward.classList.toggle('hidden', !rewardEarnedThisRun);
       secretToast.classList.remove('show');
-      gameOverPanel.classList.remove('hidden');
+      hideWpCameo();
+
+      player.deathVy = Math.max(1.8, player.vy * 0.25);
+      player.deathRotation = 0;
+
+      clearTimeout(deathTimer);
+      deathTimer = setTimeout(() => {
+        deathAnimating = false;
+        gameOver = true;
+        best = Math.max(best, score);
+        finalScoreEl.textContent = score;
+        bestScoreEl.textContent = best;
+
+        if (gameOverReward) {
+          gameOverReward.classList.toggle('hidden', !rewardEarnedThisRun);
+        }
+
+        gameOverPanel.classList.remove('hidden');
+      }, 1050);
+    }
+
+    function drawHillLayer(baseY, amplitude, wavelength, speed, fillStyle, phaseOffset=0) {
+      const offset = (frame * speed + phaseOffset) % wavelength;
+
+      ctx.save();
+      ctx.fillStyle = fillStyle;
+      ctx.beginPath();
+      ctx.moveTo(-wavelength, canvas.height);
+
+      for (let x = -wavelength - offset; x <= canvas.width + wavelength; x += wavelength) {
+        ctx.lineTo(x, baseY);
+        ctx.quadraticCurveTo(
+          x + wavelength * 0.25,
+          baseY - amplitude,
+          x + wavelength * 0.5,
+          baseY
+        );
+        ctx.quadraticCurveTo(
+          x + wavelength * 0.75,
+          baseY + amplitude * 0.12,
+          x + wavelength,
+          baseY
+        );
+      }
+
+      ctx.lineTo(canvas.width + wavelength, canvas.height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function triggerUfo(){
+      if(ufoShownThisRun) return;
+      ufoShownThisRun = true;
+      ufoActive = true;
+      ufoProgress = 0;
+    }
+
+    function updateUfo(){
+      if(!ufoActive) return;
+
+      // About 3 seconds at 60fps.
+      ufoProgress += 1 / 180;
+
+      if(ufoProgress >= 1){
+        ufoProgress = 1;
+        ufoActive = false;
+      }
+    }
+
+    function drawUfo(){
+      if(!ufoActive || !(ufoImage.complete && ufoImage.naturalWidth)) return;
+
+      const width = 54;
+      const height = width * (ufoImage.naturalHeight / ufoImage.naturalWidth);
+
+      const x = canvas.width + 80 - ufoProgress * (canvas.width + 180);
+      const y =
+        115 +
+        Math.sin(ufoProgress * Math.PI * 4) * 18 +
+        Math.sin(ufoProgress * Math.PI) * 8;
+
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(ufoImage, x, y, width, height);
+      ctx.restore();
     }
 
     function drawBackground() {
-      ctx.fillStyle = '#8fd7ef';
+      const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      sky.addColorStop(0, '#8fd7ef');
+      sky.addColorStop(0.62, '#bfe9f6');
+      sky.addColorStop(1, '#f7dfa5');
+      ctx.fillStyle = sky;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = 'rgba(255,255,255,.75)';
-      for (let i = 0; i < 6; i++) {
-        const x = (i * 210 - (frame * .35) % 1260) + 40;
-        const y = 75 + (i % 3) * 85;
+      // Simple sun, visual only. No gameplay logic changed.
+      const sunX = canvas.width * 0.78;
+      const sunY = 92;
+      const sunRadius = 48;
+
+      const sunGlow = ctx.createRadialGradient(
+        sunX, sunY, 8,
+        sunX, sunY, sunRadius * 1.75
+      );
+      sunGlow.addColorStop(0, 'rgba(255,248,180,.95)');
+      sunGlow.addColorStop(.45, 'rgba(255,205,112,.62)');
+      sunGlow.addColorStop(1, 'rgba(255,170,95,0)');
+
+      ctx.fillStyle = sunGlow;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, sunRadius * 1.75, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffe89a';
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Soft distant clouds.
+      ctx.fillStyle = 'rgba(255,255,255,.72)';
+      for (let i = 0; i < 7; i++) {
+        const x = (i * 210 - (frame * 0.22) % 1470) + 20;
+        const y = 62 + (i % 3) * 72;
         ctx.beginPath();
-        ctx.arc(x, y, 24, 0, Math.PI * 2);
-        ctx.arc(x + 28, y - 12, 32, 0, Math.PI * 2);
-        ctx.arc(x + 64, y, 24, 0, Math.PI * 2);
+        ctx.arc(x, y, 21, 0, Math.PI * 2);
+        ctx.arc(x + 27, y - 10, 29, 0, Math.PI * 2);
+        ctx.arc(x + 59, y, 22, 0, Math.PI * 2);
         ctx.fill();
       }
 
+      // Three parallax hill layers.
+      drawHillLayer(
+        canvas.height - 150,
+        54,
+        350,
+        0.16,
+        '#b9d79a',
+        70
+      );
+
+      drawHillLayer(
+        canvas.height - 112,
+        70,
+        310,
+        0.31,
+        '#8fbd79',
+        180
+      );
+
+      drawHillLayer(
+        canvas.height - 72,
+        58,
+        260,
+        0.52,
+        '#5f985d',
+        20
+      );
+
+      // Ground strip.
       ctx.fillStyle = '#f6e8a8';
       ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+
       ctx.fillStyle = '#d7c77b';
       ctx.fillRect(0, canvas.height - 70, canvas.width, 8);
     }
@@ -554,7 +756,7 @@ body{
     function drawPlayer() {
       const frame = spriteAnim.sequence[spriteAnim.frame];
       const velocityTilt = Math.max(-0.14, Math.min(0.14, player.vy * 0.018));
-      const angle = velocityTilt + frame.tilt;
+      const angle = deathAnimating ? player.deathRotation : velocityTilt + frame.tilt;
 
       ctx.save();
       ctx.translate(
@@ -589,9 +791,25 @@ body{
       ctx.restore();
     }
     function update() {
-      if (!running) return;
+      if (!running && !deathAnimating) return;
 
       frame++;
+      updateUfo();
+
+      if (deathAnimating) {
+        player.deathVy += 0.62;
+        player.y += player.deathVy;
+        player.x += 0.45;
+        player.deathRotation += 0.22;
+
+        for (const pipe of pipes) {
+          pipe.x -= obstacleSpeed;
+        }
+
+        pipes = pipes.filter(pipe => pipe.x + pipe.w > -20);
+        return;
+      }
+
       player.vy += player.gravity;
       player.y += player.vy;
 
@@ -614,6 +832,14 @@ body{
 
           if (score === 10) {
             showSecretToast();
+          }
+
+          if (score === 15) {
+            triggerUfo();
+          }
+
+          if (score === 20) {
+            triggerWpCameo();
           }
 
           if (score > 0 && score % 10 === 0) {
@@ -652,6 +878,7 @@ body{
 
     function draw() {
       drawBackground();
+      drawUfo();
       pipes.forEach(drawPipe);
       drawPlayer();
     }
@@ -686,6 +913,7 @@ body{
         event.preventDefault();
 
         if (!running) {
+          if (deathAnimating) return;
           resetGame();
           flap();
           return;
@@ -722,6 +950,7 @@ body{
       themeMusic.pause();
       flapSound.pause();
       deathSound.pause();
+      hideWpCameo();
     });
 
     draw();
