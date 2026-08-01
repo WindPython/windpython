@@ -33,14 +33,9 @@
 
 <style id="nathanielChaseStableUI">
   html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#c89b6e;
-    font-family:Arial,Helvetica,sans-serif;
+    margin:0;width:100%;height:100%;overflow:hidden;
+    background:#c89b6e;font-family:Arial,Helvetica,sans-serif;
   }
-
   body{
     background-image:
       radial-gradient(ellipse at 18% 11%,rgba(255,255,255,.16),transparent 26%),
@@ -49,135 +44,64 @@
       repeating-linear-gradient(178deg,transparent 0 33px,rgba(255,255,255,.026) 34px,transparent 36px 77px),
       linear-gradient(104deg,#d9b184 0%,#cfa375 36%,#d5aa7b 62%,#c39467 100%);
   }
-
   html,body,body *,canvas,a,button{cursor:none!important}
 
   .arcade-shell{
-    position:fixed;
-    inset:0;
-    display:grid;
-    place-items:center;
-    padding:10px;
-    box-sizing:border-box;
+    position:fixed;inset:0;display:grid;place-items:center;
+    padding:10px;box-sizing:border-box;
   }
 
   .phone-game{
-    position:relative;
-    width:min(420px,94vw);
-    aspect-ratio:.515;
-    max-height:96vh;
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    padding:10px;
-    box-sizing:border-box;
-    overflow:hidden;
-    border:7px solid #151419;
-    border-radius:58px;
-    background:#2a292d;
+    position:relative;width:min(420px,94vw);aspect-ratio:.515;max-height:96vh;
+    display:flex;flex-direction:column;align-items:stretch;
+    padding:10px;box-sizing:border-box;overflow:hidden;
+    border:7px solid #151419;border-radius:58px;background:#2a292d;
     box-shadow:0 22px 28px rgba(45,24,13,.18),inset 0 0 0 1px rgba(255,255,255,.08);
   }
 
   .game-screen{
-    position:relative;
-    flex:1 1 auto;
-    min-height:0;
-    overflow:hidden;
-    border-radius:44px 44px 24px 24px;
-    background:#05030a;
+    position:relative;flex:1 1 auto;min-height:0;overflow:hidden;
+    border-radius:44px 44px 24px 24px;background:#05030a;
   }
 
   canvas{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    display:block;
-    image-rendering:pixelated;
-    background:#05030a;
+    position:absolute;inset:0;width:100%;height:100%;display:block;
+    image-rendering:pixelated;background:#05030a;
   }
 
   .scanlines{
-    position:absolute;
-    inset:0;
-    z-index:8;
-    pointer-events:none;
-    opacity:.16;
+    position:absolute;inset:0;z-index:8;pointer-events:none;opacity:.16;
     background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(0,0,0,.36) 4px);
   }
 
   .topbar{
-    position:absolute;
-    left:0;right:0;top:0;
-    z-index:10;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:9px 10px;
-    color:#fff;
-    font:900 10px "Courier New",monospace;
+    position:absolute;left:0;right:0;top:0;z-index:10;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:9px 10px;color:#fff;font:900 10px "Courier New",monospace;
     background:linear-gradient(rgba(5,3,10,.96),rgba(5,3,10,.55),transparent);
   }
-
-  .back{
-    color:#fff;
-    text-decoration:none;
-    border:2px solid #7b5d8c;
-    background:#1b1022;
-    padding:6px 8px;
-  }
-
+  .back{color:#fff;text-decoration:none;border:2px solid #7b5d8c;background:#1b1022;padding:6px 8px}
   .hud{text-align:right;text-shadow:2px 2px #000}
   .hud strong{color:#ffe351}
 
   .overlay{
-    position:absolute;
-    inset:0;
-    z-index:20;
-    display:grid;
-    place-items:center;
-    padding:12px;
-    box-sizing:border-box;
-    overflow:hidden;
-    text-align:center;
-    color:#fff;
-    background:rgba(4,2,7,.9);
+    position:absolute;inset:0;z-index:20;display:grid;place-items:center;
+    padding:12px;box-sizing:border-box;overflow:hidden;text-align:center;
+    color:#fff;background:rgba(4,2,7,.9);
   }
-
   .overlay.hidden,.victory-vhs.hidden{display:none!important}
 
   .card{
-    width:min(90%,360px);
-    max-height:90%;
-    box-sizing:border-box;
-    overflow:hidden;
-    padding:18px;
-    background:#18101f;
-    border:4px solid #8c69a2;
-    box-shadow:7px 7px 0 #000;
+    width:min(90%,360px);max-height:90%;box-sizing:border-box;overflow:hidden;
+    padding:18px;background:#18101f;border:4px solid #8c69a2;box-shadow:7px 7px 0 #000;
   }
 
-  h1{
-    margin:0;
-    color:#ff63b6;
-    font:900 clamp(30px,8vw,44px)/.9 "Courier New",monospace;
-    text-transform:uppercase;
-  }
-
-  h2{
-    margin:8px 0 5px;
-    color:#65e6ff;
-    font:900 clamp(18px,5vw,28px) "Courier New",monospace;
-  }
-
+  h1{margin:0;color:#ff63b6;font:900 clamp(30px,8vw,44px)/.9 "Courier New",monospace;text-transform:uppercase}
+  h2{margin:8px 0 5px;color:#65e6ff;font:900 clamp(18px,5vw,28px) "Courier New",monospace}
   p{margin:5px 0;line-height:1.2}
   button{
-    border:0;
-    background:#ffe34f;
-    color:#150b1a;
-    font:900 14px "Courier New",monospace;
-    padding:10px 15px;
-    box-shadow:4px 4px 0 #000;
+    border:0;background:#ffe34f;color:#150b1a;
+    font:900 14px "Courier New",monospace;padding:10px 15px;box-shadow:4px 4px 0 #000;
   }
 
   .title-overlay{background:#07040b;z-index:12}
@@ -197,14 +121,8 @@
   .ready-note{margin-top:8px;color:#fff;font:900 10px "Courier New",monospace;text-shadow:2px 2px #000}
 
   .victory-vhs{
-    position:absolute;
-    inset:0;
-    z-index:90;
-    display:grid;
-    place-items:center;
-    overflow:hidden;
-    background:#09070b;
-    color:#fff;
+    position:absolute;inset:0;z-index:90;display:grid;place-items:center;
+    overflow:hidden;background:#09070b;color:#fff;
   }
   .vhs-noise{position:absolute;inset:-20%;opacity:.25;background-image:repeating-radial-gradient(circle at 20% 30%,rgba(255,255,255,.45) 0 1px,transparent 1px 4px),repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.13) 3px 4px);animation:vhsJitter .12s steps(2) infinite}
   .vhs-scan{position:absolute;left:0;right:0;height:18%;background:linear-gradient(transparent,rgba(255,255,255,.18),transparent);animation:vhsScan 1.1s linear infinite}
@@ -215,103 +133,54 @@
   @keyframes vhsJitter{0%{transform:translate(0,0)}50%{transform:translate(-2px,1px)}100%{transform:translate(1px,-1px)}}
   @keyframes vhsScan{from{top:-20%}to{top:110%}}
 
-  /* Final victory layout */
-  #endPanel{padding:8px}
+  /* Victory screen */
+  #endPanel{padding:8px!important}
   #endPanel .card{
-    width:min(92%,330px);
-    max-height:92%;
-    padding:12px 14px;
-    overflow:hidden;
+    width:min(92%,330px)!important;max-height:92%!important;
+    padding:12px 14px!important;overflow:hidden!important;
   }
-  #endTitle{white-space:nowrap;font-size:clamp(29px,8vw,42px)}
-  #endSub{margin:5px 0 2px;font-size:clamp(21px,6vw,30px)}
-  #endText{margin:2px 0 3px;font-size:13px}
+  #endTitle{white-space:nowrap!important;font-size:clamp(29px,8vw,42px)!important}
+  #endSub{margin:5px 0 2px!important;font-size:clamp(21px,6vw,30px)!important}
+  #endText{margin:2px 0 3px!important;font-size:13px!important}
 
   .win-heads{
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    gap:7px;
-    width:100%;
-    margin:3px auto 4px;
+    display:flex!important;justify-content:center!important;align-items:flex-end!important;
+    gap:7px!important;width:100%!important;margin:3px auto 4px!important;
   }
-
   .win-head{
-    display:block;
-    width:auto!important;
-    height:34px!important;
-    max-width:36px!important;
-    object-fit:contain!important;
-    object-position:center bottom!important;
-    flex:0 0 auto!important;
-    background:transparent!important;
-    border:0!important;
+    display:block!important;width:auto!important;height:32px!important;max-width:34px!important;
+    object-fit:contain!important;object-position:center bottom!important;
+    flex:0 0 auto!important;background:transparent!important;border:0!important;
   }
-
   .win-checks{display:none!important}
 
   .access-reward{
-    width:100%;
-    box-sizing:border-box;
-    margin:4px auto;
-    padding:6px 7px;
-    border:2px solid #65e6ff;
-    background:#090611;
-    box-shadow:3px 3px 0 #000;
-    font-family:"Courier New",monospace;
+    width:100%!important;box-sizing:border-box!important;margin:4px auto!important;
+    padding:6px 7px!important;border:2px solid #65e6ff!important;
+    background:#090611!important;box-shadow:3px 3px 0 #000!important;
+    font-family:"Courier New",monospace!important;
   }
+  .access-reward .reward-label{color:#65e6ff!important;font-size:9px!important;font-weight:900!important;letter-spacing:.7px!important}
+  .access-reward .reward-code{margin:3px 0 1px!important;color:#ffe351!important;font-size:27px!important;font-weight:900!important;white-space:nowrap!important}
+  .access-reward .reward-note{color:#fff!important;font-size:8px!important;font-weight:700!important;line-height:1.1!important}
+  #restartBtn{margin-top:4px!important;padding:8px 12px!important;font-size:13px!important}
 
-  .access-reward .reward-label{color:#65e6ff;font-size:9px;font-weight:900;letter-spacing:.7px}
-  .access-reward .reward-code{margin:3px 0 1px;color:#ffe351;font-size:27px;font-weight:900;white-space:nowrap}
-  .access-reward .reward-note{color:#fff;font-size:8px;font-weight:700;line-height:1.1}
-  #restartBtn{margin-top:4px;padding:8px 12px;font-size:13px}
-
+  /* Original compact D-pad */
   .mobile-controls{
-    flex:0 0 138px;
-    height:138px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:4px 14px 2px;
-    box-sizing:border-box;
-    pointer-events:auto;
+    flex:0 0 138px;height:138px;display:flex;justify-content:space-between;
+    align-items:center;padding:4px 14px 2px;box-sizing:border-box;pointer-events:auto;
   }
-
-  .dpad{
-    position:relative;
-    width:126px;
-    height:126px;
-    flex:0 0 126px;
-  }
-
+  .dpad{position:relative;width:126px;height:126px;flex:0 0 126px}
   .dpad::after{
-    content:"";
-    position:absolute;
-    left:41px;
-    top:41px;
-    width:44px;
-    height:44px;
-    border-radius:6px;
-    background:#201a24;
+    content:"";position:absolute;left:41px;top:41px;width:44px;height:44px;
+    border-radius:6px;background:#201a24;
   }
-
   .dpad button{
-    position:absolute;
-    width:44px;
-    height:44px;
-    margin:0;
-    padding:0;
-    line-height:44px;
-    font-size:19px;
-    border:0;
-    border-radius:6px;
-    background:#211b25;
-    color:#eee8f2;
+    position:absolute;width:44px;height:44px;margin:0;padding:0;line-height:44px;
+    font-size:19px;border:0;border-radius:6px;background:#211b25;color:#eee8f2;
     box-shadow:inset 0 2px 0 rgba(255,255,255,.08),0 4px 0 #0d0a0f;
-    touch-action:none;
-    user-select:none;
+    touch-action:none;user-select:none;
   }
-
   .dpad button:active{transform:translateY(2px);box-shadow:inset 0 2px 0 rgba(255,255,255,.05),0 2px 0 #0d0a0f}
   .dpad .up{left:41px;top:0}
   .dpad .down{left:41px;bottom:0}
@@ -321,14 +190,6 @@
   .console-buttons{min-width:112px;display:flex;flex-direction:column;align-items:center;gap:10px}
   #pauseBtn{min-width:104px;padding:10px 14px;border:2px solid #b9afc0;border-radius:999px;background:#625969;color:#fff;box-shadow:0 4px 0 #17131b;font:900 12px "Courier New",monospace}
   .console-buttons span{color:#c1b6c7;font:900 8px "Courier New",monospace;letter-spacing:2px}
-
-  @media(max-height:680px){
-    .phone-game{width:min(350px,92vw)}
-    .mobile-controls{flex-basis:112px;height:112px}
-    .dpad{transform:scale(.78);transform-origin:left center}
-    .console-buttons{transform:scale(.84);transform-origin:right center}
-    .win-head{height:29px!important}
-  }
 </style>
 </head>
 <body>
@@ -1102,130 +963,3 @@ document.addEventListener("keydown", function(event){
 
 </body>
 </html>
-<style>
-  #startPanel.hidden,
-  #titlePanel.hidden,
-  #readyPanel.hidden,
-  #endPanel.hidden {
-    display: none !important;
-    pointer-events: none !important;
-  }
-  #titleStartButton {
-    position: relative;
-    z-index: 30;
-    pointer-events: auto;
-    cursor: pointer;
-  }
-
-  /* Mobile chase comfort patch */
-  @media(max-width:760px),(pointer:coarse){
-    .dpad{
-      width:154px !important;
-      height:154px !important;
-      flex-basis:154px !important;
-    }
-    .dpad button{
-      width:56px !important;
-      height:56px !important;
-      font-size:25px !important;
-      touch-action:none !important;
-      -webkit-user-select:none !important;
-      user-select:none !important;
-    }
-    .dpad .up{left:49px !important;top:0 !important}
-    .dpad .down{left:49px !important;bottom:0 !important}
-    .dpad .left{left:0 !important;top:49px !important}
-    .dpad .right{right:0 !important;top:49px !important}
-  }
-
-  #endPanel .card{
-    width:min(94%,390px) !important;
-    max-height:92% !important;
-    overflow-y:auto !important;
-    padding:clamp(15px,4vw,24px) !important;
-  }
-  #endTitle{
-    font-size:clamp(34px,11vw,58px) !important;
-    line-height:.92 !important;
-    white-space:nowrap !important;
-    word-break:normal !important;
-    overflow-wrap:normal !important;
-  }
-  #endSub{
-    font-size:clamp(27px,8vw,44px) !important;
-    margin:10px 0 6px !important;
-  }
-  #endText{
-    font-size:clamp(14px,3.7vw,18px) !important;
-    margin:7px 0 !important;
-  }
-  @media(max-width:430px){
-    .win-heads{gap:2px !important}
-    .win-head{
-      width:min(16vw,52px) !important;
-      height:min(24vw,80px) !important;
-    }
-  }
-
-  /* Compact victory layout: everything fits inside the phone without scrolling. */
-  #endPanel .card{
-    width:min(90%,350px) !important;
-    max-height:88% !important;
-    overflow:hidden !important;
-    padding:14px 16px 13px !important;
-  }
-  #endTitle{
-    font-size:clamp(31px,9vw,48px) !important;
-    line-height:.92 !important;
-    margin:0 !important;
-    white-space:nowrap !important;
-  }
-  #endSub{
-    font-size:clamp(24px,7vw,35px) !important;
-    margin:7px 0 2px !important;
-  }
-  #endText{
-    font-size:clamp(13px,3.5vw,17px) !important;
-    line-height:1.15 !important;
-    margin:4px 0 6px !important;
-  }
-  .win-heads{
-    display:flex !important;
-    justify-content:center !important;
-    align-items:flex-end !important;
-    gap:clamp(7px,2.2vw,13px) !important;
-    width:100% !important;
-    margin:4px auto 5px !important;
-  }
-  .win-head{
-    width:auto !important;
-    height:clamp(39px,11vw,55px) !important;
-    object-fit:contain !important;
-    object-position:center bottom !important;
-    flex:0 0 auto !important;
-  }
-  .access-reward{
-    width:100% !important;
-    box-sizing:border-box !important;
-    margin:6px auto 5px !important;
-    padding:7px 8px !important;
-  }
-  .access-reward .reward-label{
-    font-size:clamp(8px,2.1vw,11px) !important;
-    line-height:1.1 !important;
-    white-space:normal !important;
-  }
-  .access-reward .reward-code{
-    margin:4px 0 2px !important;
-    font-size:clamp(23px,6.8vw,34px) !important;
-    line-height:1 !important;
-  }
-  .access-reward .reward-note{
-    font-size:clamp(8px,2.15vw,11px) !important;
-    line-height:1.15 !important;
-  }
-  #endPanel .btn{
-    margin-top:4px !important;
-    padding:8px 12px !important;
-  }
-</style>
