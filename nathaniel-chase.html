@@ -495,15 +495,33 @@
   const gameMusic = new Audio("assets/audio/nathaniel-game-music.mp3");
   gameMusic.preload = "auto";
   gameMusic.loop = true;
-  gameMusic.volume = 0.14;
+
+  function setGameMusicVolume(){
+    const isMobileAudio =
+      window.matchMedia("(pointer:coarse)").matches ||
+      window.matchMedia("(max-width:760px)").matches ||
+      navigator.maxTouchPoints > 0 ||
+      /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+    // Nathaniel gameplay music only:
+    // mobile much lower so effects stay clear, desktop unchanged.
+    gameMusic.volume = isMobileAudio ? 0.055 : 0.14;
+  }
 
   function startGameMusic(){
     try{
+      setGameMusicVolume();
       gameMusic.pause();
       gameMusic.currentTime = 0;
       gameMusic.play().catch(()=>{});
     }catch(_){}
   }
+
+
+  window.addEventListener("resize", setGameMusicVolume);
+  document.addEventListener("visibilitychange", ()=>{
+    if(!document.hidden) setGameMusicVolume();
+  });
 
   function stopParentChaseMusic(){
     if(!embeddedMode || window.parent === window) return;
@@ -1001,9 +1019,6 @@
     burgerCollectSound.pause(); burgerCollectSound.currentTime=0;
     runSound.pause(); runSound.currentTime=0;
     gotchaSound.pause(); gotchaSound.currentTime=0;
-    gameMusic.pause();
-    gameMusic.currentTime=0;
-    gameMusic.play().catch(()=>{});
     resetLevel(true);
     waitingForDirection=false;
     directionInputArmed=true;
