@@ -492,7 +492,8 @@
   const buttBurgerImg = new Image();
   buttBurgerImg.src = "assets/images/nathaniel-chase/butt-burger.png";
 
-  let pellets, powerups, player, enemies, score, lives, caughtNathaniels, running, pausedByUser=false, powerTimer, lastTime, moveAccumulator, enemyAccumulator, readyTimer, enemyMoveCounter=0, captureAnimations=[], currentEnemyStepTime=.39, waitingForDirection=false;
+  let pellets, powerups, player, enemies, score, lives, caughtNathaniels, running, pausedByUser=false, powerTimer, lastTime, moveAccumulator, enemyAccumulator, readyTimer, enemyMoveCounter=0, captureAnimations=[], currentEnemyStepTime=.39, waitingForDirection=false, directionInputArmed=true;
+  const heldDirectionKeys=new Set();
 
   function key(x,y){ return x+","+y; }
   function walkable(x,y){
@@ -618,6 +619,7 @@
 
     player={x:6,y:11,prevX:6,prevY:11,dir:"right",next:"right",facing:1};
     waitingForDirection=true;
+    directionInputArmed=false;
     moveAccumulator=0;
     enemies.forEach((e,i)=>{
       e.x=e.home.x;e.y=e.home.y;
@@ -813,14 +815,14 @@
     const cy=pos.y*TILE+18;
     const bob=running ? Math.sin(performance.now()/130)*0.7 : 0;
 
-    if(!running || waitingForDirection){
+    if(!running){
       ctx.save();
       ctx.fillStyle="#ffe351";
       ctx.fillRect(player.x*TILE+3,player.y*TILE+25,TILE-6,4);
       ctx.fillStyle="#fff";
       ctx.font='bold 7px "Courier New"';
       ctx.textAlign="center";
-      ctx.fillText(waitingForDirection ? "MOVE" : "START",player.x*TILE+16,player.y*TILE+31);
+      ctx.fillText("START",player.x*TILE+16,player.y*TILE+31);
       ctx.restore();
     }
 
@@ -882,7 +884,7 @@
     if(powerTimer>0){
       ctx.fillStyle="#7beaff";
       ctx.font='bold 14px "Courier New"';
-      ctx.fillText("WATER POWER "+powerTimer.toFixed(1),12,canvas.height-15);
+      ctx.fillText("PYTHON POWER "+powerTimer.toFixed(1),12,canvas.height-15);
     }
   }
 
@@ -911,6 +913,8 @@
     gameMusic.play().catch(()=>{});
     resetLevel(true);
     waitingForDirection=false;
+    directionInputArmed=true;
+    heldDirectionKeys.clear();
     running=false;
     startPanel.classList.add("hidden");
     endPanel.classList.add("hidden");
@@ -964,23 +968,47 @@
 
   function setDirection(dir){
     if(!dirs[dir]) return;
+    if(waitingForDirection && !directionInputArmed) return;
+
     player.next=dir;
     player.dir=dir;
     waitingForDirection=false;
   }
 
+  const directionKeyMap={
+    ArrowLeft:"left",KeyA:"left",ArrowRight:"right",KeyD:"right",
+    ArrowUp:"up",KeyW:"up",ArrowDown:"down",KeyS:"down"
+  };
+
   addEventListener("keydown",e=>{
-    const mapKeys={
-      ArrowLeft:"left",KeyA:"left",ArrowRight:"right",KeyD:"right",
-      ArrowUp:"up",KeyW:"up",ArrowDown:"down",KeyS:"down"
-    };
-    if(mapKeys[e.code]){e.preventDefault();setDirection(mapKeys[e.code]);}
+    const dir=directionKeyMap[e.code];
+    if(!dir) return;
+
+    e.preventDefault();
+    heldDirectionKeys.add(e.code);
+
+    // Ignore auto-repeat and any key that was already held when WP respawned.
+    if(e.repeat || (waitingForDirection && !directionInputArmed)) return;
+    setDirection(dir);
+  });
+
+  addEventListener("keyup",e=>{
+    if(!directionKeyMap[e.code]) return;
+
+    heldDirectionKeys.delete(e.code);
+
+    // Once every previously held direction key is released, the next fresh
+    // key press is allowed to move WP again.
+    if(waitingForDirection && heldDirectionKeys.size===0){
+      directionInputArmed=true;
+    }
   });
 
   document.querySelectorAll("[data-dir]").forEach(btn=>{
     const dir=btn.dataset.dir;
     const chooseDirection=e=>{
       e.preventDefault();
+      directionInputArmed=true;
       setDirection(dir);
     };
     btn.addEventListener("pointerdown",chooseDirection);
@@ -1003,6 +1031,7 @@
     swipeStart=null;
 
     if(Math.max(Math.abs(dx),Math.abs(dy))<18) return;
+    directionInputArmed=true;
     if(Math.abs(dx)>Math.abs(dy)){
       setDirection(dx>0?"right":"left");
     }else{
