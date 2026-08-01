@@ -345,6 +345,15 @@
   burgerCollectSound.volume = 0.95;
 
 
+  const gotchaSound = new Audio("nathaniel-gotcha.mp3");
+  gotchaSound.preload = "auto";
+  gotchaSound.volume = 0.95;
+
+  const runSound = new Audio("nathaniel-run.mp3");
+  runSound.preload = "auto";
+  runSound.volume = 0.9;
+
+
   const titleLoopSound = new Audio("assets/audio/iwannashow.mp3");
   titleLoopSound.preload = "auto";
   titleLoopSound.loop = true;
@@ -360,7 +369,7 @@
   }
 
   function stopAllCharacterAudio(except=null){
-    [caughtSound,loseSound,winSound,startSound].forEach(audio=>{
+    [caughtSound,loseSound,winSound,startSound,gotchaSound].forEach(audio=>{
       if(audio!==except) stopAudio(audio);
     });
   }
@@ -552,10 +561,16 @@
   function loseLife(){
     lives--;
     updateHud();
+
     if(lives<=0){
       finish(false);
       return;
     }
+
+    stopAllCharacterAudio(gotchaSound);
+    gotchaSound.currentTime=0;
+    gotchaSound.play().catch(()=>{});
+
     player={x:6,y:11,prevX:6,prevY:11,dir:"right",next:"right",facing:1};
     enemies.forEach((e,i)=>{
       e.x=e.home.x;e.y=e.home.y;
@@ -601,9 +616,23 @@
     if(powerups.delete(k)){
       score+=50;
       powerTimer=15;
+      runSound.pause();
+      runSound.currentTime=0;
+
       burgerCollectSound.pause();
       burgerCollectSound.currentTime=0;
-      burgerCollectSound.play().catch(()=>{});
+
+      const playRunAfterCollect = () => {
+        burgerCollectSound.removeEventListener("ended", playRunAfterCollect);
+        runSound.currentTime=0;
+        runSound.play().catch(()=>{});
+      };
+
+      burgerCollectSound.addEventListener("ended", playRunAfterCollect, {once:true});
+      burgerCollectSound.play().catch(()=>{
+        burgerCollectSound.removeEventListener("ended", playRunAfterCollect);
+        runSound.play().catch(()=>{});
+      });
     }
     updateHud();
     collisionCheck();
@@ -824,6 +853,8 @@
     captureAnimations=[];
     stopAllCharacterAudio();
     burgerCollectSound.pause(); burgerCollectSound.currentTime=0;
+    runSound.pause(); runSound.currentTime=0;
+    gotchaSound.pause(); gotchaSound.currentTime=0;
     gameMusic.pause();
     gameMusic.currentTime=0;
     gameMusic.play().catch(()=>{});
@@ -852,6 +883,8 @@
 
     gameMusic.pause();
     gameMusic.currentTime=0;
+    runSound.pause();
+    runSound.currentTime=0;
 
     endTitle.textContent=won?"CAPTURED":"GAME OVER";
     endSub.textContent=won?"5 / 5":"NATHANIEL CAUGHT WIND PYTHON";
@@ -935,6 +968,8 @@
   homeBtn.addEventListener("click",()=>{
     stopTitleLoop();
     gameMusic.pause();
+    runSound.pause();
+    runSound.currentTime=0;
     stopAllCharacterAudio();
 
     if(embeddedMode && window.parent !== window){
@@ -949,6 +984,7 @@
     pauseBtn.textContent=pausedByUser?"RESUME":"PAUSE";
     if(pausedByUser){
       gameMusic.pause();
+      runSound.pause();
     }else if(endPanel.classList.contains("hidden") && victoryVhs.classList.contains("hidden")){
       lastTime=performance.now();
       gameMusic.play().catch(()=>{});
