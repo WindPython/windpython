@@ -261,28 +261,27 @@
 
 
 
+
   .hardware-hud{
     position:relative;
-    flex:0 0 56px;
-    height:56px;
-    margin:5px 10px 1px;
+    flex:0 0 46px;
+    height:46px;
+    margin:4px 14px 1px;
     display:flex;
     align-items:center;
     justify-content:center;
     box-sizing:border-box;
+    background:transparent;
   }
-  .hardware-hud-art{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:fill;
+
+  .hardware-hud.hidden{
+    visibility:hidden;
     pointer-events:none;
   }
+
   .hardware-hud-values{
     position:relative;
-    z-index:2;
-    width:88%;
+    width:100%;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -292,13 +291,22 @@
     color:#fff;
     text-shadow:2px 2px 0 #000;
   }
+
   .hardware-hud-values b{color:#d8cde0}
   .hardware-hud-values strong{color:#ffe351}
-  @media(max-width:520px){
-    .hardware-hud{flex-basis:49px;height:49px;margin:4px 7px 0}
-    .hardware-hud-values{width:90%;gap:6px;font-size:8px}
-  }
 
+  @media(max-width:520px){
+    .hardware-hud{
+      flex-basis:42px;
+      height:42px;
+      margin:3px 10px 0;
+    }
+
+    .hardware-hud-values{
+      gap:5px;
+      font-size:8px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -374,9 +382,8 @@
     </section>
     </div>
 
-    <div class="hardware-hud" aria-label="Game status">
-      <img class="hardware-hud-art" src="nathaniel-hud-strip.png" alt="">
-      <div class="hardware-hud-values">
+    <div class="hardware-hud hidden" id="hardwareHud" aria-label="Game status">
+<div class="hardware-hud-values">
         <span><b>SCORE</b> <strong id="hudScoreBody">0000</strong></span>
         <span><b>LIVES</b> <strong id="hudLivesBody">4</strong></span>
         <span><b>CAPTURED</b> <strong id="hudCapturedBody">0/5</strong></span>
@@ -408,6 +415,7 @@
   ctx.imageSmoothingEnabled = false;
 
   const scoreEl = document.getElementById("score");
+  const hardwareHud = document.getElementById("hardwareHud");
   const livesEl = document.getElementById("lives");
   const caughtEl = document.getElementById("caught");
   const titlePanel = document.getElementById("titlePanel");
@@ -1038,6 +1046,7 @@
     startPanel.classList.add("hidden");
     endPanel.classList.add("hidden");
     readyPanel.classList.remove("hidden");
+    hardwareHud.classList.add("hidden");
 
     startSound.pause();
     startSound.currentTime=0;
@@ -1045,6 +1054,7 @@
 
     readyTimer=setTimeout(()=>{
       readyPanel.classList.add("hidden");
+      hardwareHud.classList.remove("hidden");
       moveAccumulator=0;
       running=true;
     },1400);
@@ -1054,6 +1064,7 @@
     if(!running && !endPanel.classList.contains("hidden")) return;
     running=false;
     pausedByUser=false;
+    hardwareHud.classList.add("hidden");
     pauseBtn.textContent="PAUSE";
 
     gameMusic.pause();
@@ -1169,6 +1180,7 @@
   }
 
   homeBtn.addEventListener("click",()=>{
+    hardwareHud.classList.add("hidden");
     stopTitleLoop();
     gameMusic.pause();
     runSound.pause();
