@@ -3,7 +3,35 @@ unlockSound.preload="auto";
 unlockSound.playsInline=true;
 unlockSound.load();
 
+let unlockSoundPrimed=false;
 let unlockSoundPlayedForGesture=false;
+
+function primeUnlockSoundSilently(){
+  if(unlockSoundPrimed) return;
+
+  try{
+    const previousVolume=unlockSound.volume;
+    unlockSound.volume=0;
+    unlockSound.currentTime=0;
+
+    const attempt=unlockSound.play();
+    if(attempt && typeof attempt.then==="function"){
+      attempt.then(()=>{
+        unlockSound.pause();
+        unlockSound.currentTime=0;
+        unlockSound.volume=previousVolume;
+        unlockSoundPrimed=true;
+      }).catch(()=>{
+        unlockSound.volume=previousVolume;
+      });
+    }else{
+      unlockSound.pause();
+      unlockSound.currentTime=0;
+      unlockSound.volume=previousVolume;
+      unlockSoundPrimed=true;
+    }
+  }catch(_){}
+}
 
 function playUnlockSoundFromGesture(){
   if(unlockSoundPlayedForGesture) return;
@@ -122,9 +150,14 @@ function unlockPhone() {
 
 unlockHandle.addEventListener("pointerdown", (event) => {
   resetUnlockSoundGesture();
+  primeUnlockSoundSilently();
   unlockHandle.setPointerCapture(event.pointerId);
   beginDrag(event.clientX);
 });
+
+unlockHandle.addEventListener("touchstart", () => {
+  primeUnlockSoundSilently();
+}, {passive:true});
 
 unlockHandle.addEventListener("pointermove", (event) => moveDrag(event.clientX));
 unlockHandle.addEventListener("pointerup", endDrag);
